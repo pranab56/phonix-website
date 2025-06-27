@@ -10,6 +10,7 @@ import toast from 'react-hot-toast';
 import { getImageUrl } from '../../../../utils/getImageUrl';
 import { ThemeContext } from '../../ClientLayout';
 import { isAuthenticated } from '../../../../utils/auth';
+import Loading from '../../../components/Loading/Loading';
 
 
 const ProfileBanner = () => {
@@ -102,7 +103,7 @@ const ProfileBanner = () => {
         {
           getbuyUserLoading ? (
             <div className='flex justify-center py-20'>
-              <Spin className={isDarkMode ? 'text-gray-200' : ''} />
+              <Loading />
             </div>
           ) : (
             [...(data?.data || [])].reverse().map((post, index) => (

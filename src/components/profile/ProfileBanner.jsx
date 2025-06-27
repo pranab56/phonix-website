@@ -5,6 +5,7 @@ import { Button, Col, Form, Grid, Input, message, Modal, Row, Spin, Upload } fro
 import { useContext, useEffect, useState } from 'react';
 import { getImageUrl } from '../../../utils/getImageUrl';
 import { ThemeContext } from '../../app/ClientLayout';
+import Loading from '../Loading/Loading';
 
 
 const ProfileBanner = () => {
@@ -100,7 +101,7 @@ const ProfileBanner = () => {
   if (profileLoading) {
     return (
       <div className={`pt-20 pb-10 flex items-center justify-center ${isDarkMode ? 'bg-gray-800' : 'bg-[#EBEBFF]'}`}>
-        <Spin />
+          <Loading />
       </div>
     );
   }

@@ -1,0 +1,27 @@
+.category-transition {
+  transition: all 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.subcategory-transition {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.category-expandable {
+  transition:
+    max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.5s ease,
+    margin 0.5s ease;
+  will-change: max-height, opacity, margin;
+}
+
+.hover-scale-effect {
+  transition: transform 0.2s ease-out;
+}
+
+.hover-scale-effect:hover {
+  transform: scale(1.02);
+}
+
+.hover-scale-effect:active {
+  transform: scale(0.98);
+}

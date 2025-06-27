@@ -7,6 +7,7 @@ import CustomBanner from '@/components/CustomBanner';
 import { useGetfaqCategoryQuery, useGetfaqQuery } from '@/features/faqs/faqsApi';
 import CategorySidebar from '../../components/support/CategorySidebar';
 import FaqList from '../../components/support/FaqList';
+import Loading from '../../components/Loading/Loading';
 
 const FaqPage = () => {
   // Get dark mode state from context
@@ -70,7 +71,7 @@ const FaqPage = () => {
           {
             faqLoading || categoryLoading ? (
               <div className='flex justify-center'>
-                <Spin />
+                <Loading />
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8">

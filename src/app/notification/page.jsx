@@ -14,6 +14,7 @@ import { useContext, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { ThemeContext } from '../ClientLayout';
+import Loading from '../../components/Loading/Loading';
 const { Content } = Layout;
 // Custom loading icon
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
@@ -198,8 +199,10 @@ export default function NotificationPage() {
             {/* Loading state */}
             {allNotificationLoading && (
               <div className="p-8 text-center">
-                <Spin indicator={antIcon} />
-                <p className={`mt-2 ${textMutedClass}`}>Loading notifications...</p>
+                {/* <Spin indicator={antIcon} />
+                <p className={`mt-2 ${textMutedClass}`}>Loading notifications...</p> */}
+
+                <Loading />
               </div>
             )}
             {/* Empty state */}

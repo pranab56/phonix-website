@@ -5,6 +5,7 @@ import { Spin } from 'antd';
 import { useContext } from 'react';
 import { useTermsAndConditionQuery } from '../../features/About/AboutApi';
 import { ThemeContext } from '../ClientLayout';
+import Loading from '../../components/Loading/Loading';
 
 const page = () => {
   const { data, isLoading, isError } = useTermsAndConditionQuery();
@@ -14,7 +15,7 @@ const page = () => {
     if (isLoading) {
       return (
         <div className='flex justify-center'>
-          <Spin className={isDarkMode ? 'dark-spin' : ''} />
+          <Loading />
         </div>
       );
     }

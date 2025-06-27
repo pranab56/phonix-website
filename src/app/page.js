@@ -254,7 +254,7 @@ const HomePage = () => {
         WebkitOverflowScrolling: 'touch',
       }}
     >
-      {isLoading ? <div className='flex justify-center h-[300px]'><Spin size='default' /></div> : postColumns.map((column, columnIndex) => (
+      {isLoading ? <div className='flex justify-center h-[300px]'><Loading /></div> : postColumns.map((column, columnIndex) => (
         <div key={columnIndex} className="flex-1 flex flex-col gap-4">
           {column.map((post) => (
             <PostCard
@@ -330,7 +330,7 @@ const HomePage = () => {
               {/* Loading state for category changes */}
               {isLoading ? (
                 <div className="flex justify-center items-center h-[400px]">
-                  <Spin size="default" />
+                 <Loading />
                 </div>
               ) : posts.length === 0 ? (
                 // <EmptyState />
@@ -359,10 +359,12 @@ const HomePage = () => {
 
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
-                <Spin size="default" />
+                <Loading />
               </div>
             ) : posts.length === 0 ? (
-              <EmptyState />
+              <div>
+                <h1>No posts Avalable</h1>
+              </div>
             ) : (
               <PostsGrid />
             )}
