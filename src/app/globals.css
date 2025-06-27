@@ -1,0 +1,102 @@
+@import "tailwindcss";
+
+/* Add these to your globals.css file */
+
+:root {
+  --background-color: #ffffff;
+  --text-color: rgba(0, 0, 0, 0.88);
+  --border-color: #E5E4E2;
+  --card-bg: #ffffff;
+  --hover-bg: #f5f5f5;
+  --secondary-bg: #f9fafb;
+}
+
+.dark {
+  --background-color: #1a1a1a;
+  --text-color: rgba(255, 255, 255, 0.85);
+  --border-color: #424242;
+  --card-bg: #1f1f1f;
+  --hover-bg: #2a2a2a;
+  --secondary-bg: #141414;
+}
+
+/* Theme transition */
+.theme-transition,
+.theme-transition *,
+.theme-transition *:before,
+.theme-transition *:after {
+  transition: background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+/* Custom component theme classes */
+.custom-card {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.custom-card:hover {
+  background-color: var(--hover-bg);
+}
+
+/* Make form elements properly themed */
+/* .dark input, */
+.dark select,
+.dark textarea {
+  background-color: #1f1f1f !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  border-color: #424242 !important;
+}
+
+/* .dark input:focus, */
+.dark select:focus,
+.dark textarea:focus {
+  border-color: #4E4EFB !important;
+  box-shadow: 0 0 0 2px rgba(78, 78, 251, 0.2) !important;
+}
+
+/* For custom elements that need theming */
+.themed-element {
+  background-color: var(--background-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+
+/* 
+@theme {
+  --color-primary: #0001FB;
+  --color-secondary: #000000;
+} */
+
+/* Add to your global CSS */
+.subcategory-enter {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+.subcategory-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 300ms ease;
+}
+
+.subcategory-exit {
+  opacity: 1;
+}
+
+.subcategory-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 300ms ease;
+}
+
+
+.ant-upload-list-item-actions .anticon-eye {
+  display: none !important;
+}
