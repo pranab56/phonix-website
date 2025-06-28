@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useContext, useMemo, useState } from 'react';
 import { baseURL } from '../../utils/BaseURL';
 import { ThemeContext } from '../app/ClientLayout';
-import './CategoriesSidebar.css';
 
 const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCategory }) => {
   const [expandedCategories, setExpandedCategories] = useState({});
@@ -52,26 +51,30 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
     const imageUrl = isDarkMode && category.darkImage ? category.darkImage : category.image;
 
     return imageUrl ? (
-      <div className={`p-3 rounded-xl transition-all duration-300 ${
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 ${
         isSelected
-          ? 'bg-white/20 text-white shadow-lg'
-          : 'bg-white text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
-      } shadow-sm group-hover:shadow-md`}>
+          ? 'bg-blue-500 shadow-sm'
+          : isDarkMode 
+            ? 'bg-gray-700' 
+            : 'bg-gray-100'
+      }`}>
         <Image
           src={`${baseURL}${imageUrl}`}
           alt={category?.name || "Category image"}
-          width={20}
-          height={20}
+          width={18}
+          height={18}
           className="object-contain"
         />
       </div>
     ) : (
-      <div className={`p-3 rounded-xl transition-all duration-300 ${
+      <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 ${
         isSelected
-          ? 'bg-white/20 text-white shadow-lg'
-          : 'bg-white text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
-      } shadow-sm group-hover:shadow-md`}>
-        <UnorderedListOutlined size={20} />
+          ? 'bg-blue-500 text-white shadow-sm'
+          : isDarkMode 
+            ? 'bg-gray-700 text-gray-300' 
+            : 'bg-gray-100 text-gray-600'
+      }`}>
+        {/* <UnorderedListOutlined size={18} /> */}
       </div>
     );
   };
@@ -80,19 +83,17 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
     const imageUrl = isDarkMode && subcategory.darkImage ? subcategory.darkImage : subcategory.image;
 
     return imageUrl ? (
-      <div className={`w-5 h-5 mr-2 transition-all duration-300 ${isSelected ? 'scale-110' : ''}`}>
+      <div className="w-8 h-8 rounded-md flex items-center justify-center bg-gray-50 dark:bg-gray-700">
         <Image
           src={`${baseURL}${imageUrl}`}
           alt={subcategory?.name || "Subcategory image"}
-          width={20}
-          height={20}
+          width={16}
+          height={16}
           className="object-contain"
         />
       </div>
     ) : (
-      <div className={`w-5 h-5 mr-2 flex items-center justify-center text-xs font-medium transition-all duration-300 ${
-        isSelected ? 'scale-110 text-white' : isDarkMode ? 'text-gray-200' : 'text-gray-600'
-      }`}>
+      <div className="w-8 h-8 rounded-md flex items-center justify-center bg-gray-50 dark:bg-gray-700 text-xs font-medium text-gray-600 dark:text-gray-300">
         {subcategory.name?.charAt(0)}
       </div>
     );
@@ -100,20 +101,26 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
 
   if (categoryLoading) {
     return (
-      <div className="bg-white rounded-2xl shadow-xl p-6 border border-gray-100 dark:bg-gray-800 dark:border-gray-700 category-transition">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 text-center">Categories</h2>
+      <div className={`rounded-2xl p-6 ${
+        isDarkMode ? 'bg-gray-800' : 'bg-white'
+      } shadow-sm border border-gray-200 dark:border-gray-700`}>
+        <h2 className={`text-xl font-semibold mb-6 ${
+          isDarkMode ? 'text-white' : 'text-gray-900'
+        }`}>
+          Categories
+        </h2>
         <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`rounded-2xl shadow-xl p-6 border ${
-      isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-100'
-    } category-transition`}>
-      <h2 className={`text-2xl font-bold mb-6 text-center ${
+    <div className={`rounded-2xl p-6 ${
+      isDarkMode ? 'bg-gray-800' : 'bg-white'
+    } shadow-sm border border-gray-200 h-fit`}>
+      <h2 className={`text-xl font-semibold mb-6 ${
         isDarkMode ? 'text-white' : 'text-gray-900'
       }`}>
         Categories
@@ -123,35 +130,32 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
         {/* All Posts Button */}
         <div
           onClick={handleShowAllPosts}
-          className={`flex items-center justify-between p-4 rounded-xl cursor-pointer
-          category-transition hover-scale-effect ${
+          className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 ${
             !selectedCategory && !selectedSubCategory
-              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg'
+              ? isDarkMode
+                ? 'bg-blue-600 text-white'
+                : 'bg-blue-50 text-blue-700 border border-blue-200'
               : isDarkMode
-                ? 'bg-gray-700 hover:bg-gray-600'
-                : 'bg-gray-50 hover:bg-gray-100'
+                ? 'hover:bg-gray-700 text-gray-200'
+                : 'hover:bg-gray-50 text-gray-700'
           }`}
         >
-          <div className="flex items-center space-x-4">
-            <div className={`p-3 rounded-xl transition-all duration-300 ${
-              !selectedCategory && !selectedSubCategory
-                ? 'bg-white/20 text-white shadow-lg'
-                : isDarkMode
-                  ? 'bg-gray-600 text-gray-200'
-                  : 'bg-white text-gray-600 group-hover:bg-blue-100 group-hover:text-blue-600'
-            } shadow-sm group-hover:shadow-md`}>
-              {/* <UnorderedListOutlined size={20} /> */}
-            </div>
-            <div>
-              <h3 className={`font-semibold text-lg transition-colors duration-300 ${
-                !selectedCategory && !selectedSubCategory ? 'text-white' : isDarkMode ? 'text-white' : 'text-gray-900'
+          <div className="flex items-center space-x-3">
+            {renderCategoryIcon({ name: 'All Posts' }, !selectedCategory && !selectedSubCategory)}
+            <div className="min-w-0 flex-1">
+              <h3 className={`font-medium text-sm leading-tight ${
+                !selectedCategory && !selectedSubCategory 
+                  ? isDarkMode ? 'text-white' : 'text-blue-700'
+                  : isDarkMode ? 'text-gray-200' : 'text-gray-900'
               }`}>
                 All Posts
               </h3>
-              <p className={`text-sm transition-colors duration-300 ${
-                !selectedCategory && !selectedSubCategory ? 'text-white/80' : isDarkMode ? 'text-gray-400' : 'text-gray-500'
+              <p className={`text-xs leading-tight mt-0.5 ${
+                !selectedCategory && !selectedSubCategory 
+                  ? isDarkMode ? 'text-blue-100' : 'text-blue-600'
+                  : isDarkMode ? 'text-gray-400' : 'text-gray-500'
               }`}>
-                {totalPosts} Posts
+                {totalPosts.toLocaleString()} Posts
               </p>
             </div>
           </div>
@@ -166,58 +170,64 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
           const isSelected = selectedCategory === category._id && !selectedSubCategory;
 
           return (
-            <div key={category._id} className="group">
+            <div key={category._id}>
               <div
                 onClick={() => selectCategory(category._id)}
-                className={`flex items-center justify-between p-4 rounded-xl cursor-pointer
-                category-transition hover-scale-effect ${
+                className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                   isSelected
-                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-lg'
-                    : isExpanded
-                      ? isDarkMode
-                        ? 'bg-gray-700 shadow-md'
-                        : 'bg-gradient-to-r from-blue-50 to-indigo-50 shadow-md hover:from-blue-100 hover:to-indigo-100'
-                      : isDarkMode
-                        ? 'bg-gray-700 hover:bg-gray-600'
-                        : 'bg-gray-50 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50'
+                    ? isDarkMode
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-blue-50 text-blue-700 border border-blue-200'
+                    : isDarkMode
+                      ? 'hover:bg-gray-700 text-gray-200'
+                      : 'hover:bg-gray-50 text-gray-700'
                 }`}
               >
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3">
                   {renderCategoryIcon(category, isSelected)}
-                  <div>
-                    <h3 className={`font-semibold text-lg transition-colors duration-300 ${
-                      isSelected ? 'text-white' : isDarkMode ? 'text-white' : 'text-gray-900'
+                  <div className="min-w-0 flex-1">
+                    <h3 className={`font-medium text-sm leading-tight ${
+                      isSelected 
+                        ? isDarkMode ? 'text-white' : 'text-blue-700'
+                        : isDarkMode ? 'text-gray-200' : 'text-gray-900'
                     }`}>
                       {category.name}
                     </h3>
-                    <p className={`text-sm transition-colors duration-300 ${
-                      isSelected ? 'text-white/80' : isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                    <p className={`text-xs leading-tight mt-0.5 ${
+                      isSelected 
+                        ? isDarkMode ? 'text-blue-100' : 'text-blue-600'
+                        : isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     }`}>
-                      {category.postCount || 0} Posts
+                      {(category.postCount || 0).toLocaleString()} Posts
                     </p>
                   </div>
                 </div>
 
                 {hasSubcategories && (
                   <ChevronDown
-                    className={`w-5 h-5 transition-all duration-300 ease-out ${
+                    className={`w-4 h-4 transition-transform duration-700 ease-out ${
                       isSelected
-                        ? 'text-white'
-                        : isExpanded
-                          ? isDarkMode ? 'text-white' : 'text-blue-600'
-                          : isDarkMode ? 'text-gray-400' : 'text-gray-400'
+                        ? isDarkMode ? 'text-white' : 'text-blue-700'
+                        : isDarkMode ? 'text-gray-400' : 'text-gray-500'
                     } ${isExpanded ? 'rotate-180' : ''}`}
                   />
                 )}
               </div>
 
+              {/* Subcategories */}
               {hasSubcategories && (
-                <div className={`overflow-hidden category-expandable ${
-                  isExpanded 
-                    ? 'max-h-[1000px] opacity-100 mt-2' 
-                    : 'max-h-0 opacity-0'
-                }`}>
-                  <div className="ml-6 ">
+                <div 
+                  className={`overflow-hidden transition-all duration-700 ease-out ${
+                    isExpanded 
+                      ? 'opacity-100 mt-2' 
+                      : 'opacity-0 mt-0'
+                  }`}
+                  style={{
+                    maxHeight: isExpanded ? `${subcategories.length * 48 + 8}px` : '0px',
+                    transition: 'max-height 700ms cubic-bezier(0.4, 0, 0.2, 1), opacity 700ms cubic-bezier(0.4, 0, 0.2, 1), margin-top 700ms cubic-bezier(0.4, 0, 0.2, 1)'
+                  }}
+                >
+                  <div className="ml-4 space-y-1">
                     {subcategories.map((subcategory) => {
                       const isSubSelected = selectedSubCategory === subcategory._id && selectedCategory === category._id;
 
@@ -228,30 +238,33 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
                             e.stopPropagation();
                             selectSubcategory(category._id, subcategory._id);
                           }}
-                          className={`p-3 rounded-lg cursor-pointer
-                          subcategory-transition hover:translate-x-2 ${
+                          className={`flex items-center justify-between p-2.5 rounded-md cursor-pointer transition-all duration-200 ${
                             isSubSelected
-                              ? 'bg-gradient-to-r from-blue-500 to-indigo-600 shadow-md'
+                              ? isDarkMode
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-blue-50 text-blue-700 border border-blue-200'
                               : isDarkMode
-                                ? 'hover:bg-gray-600'
-                                : 'hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50'
+                                ? 'hover:bg-gray-700 text-gray-300'
+                                : 'hover:bg-gray-50 text-gray-600'
                           }`}
                         >
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center">
-                              {renderSubcategoryIcon(subcategory, isSubSelected)}
-                              <h4 className={`font-medium text-sm transition-colors duration-300 ${
-                                isSubSelected ? 'text-white' : isDarkMode ? 'text-gray-200' : 'text-gray-700'
-                              }`}>
-                                {subcategory.name}
-                              </h4>
-                            </div>
-                            <span className={`text-xs transition-colors duration-300 ${
-                              isSubSelected ? 'text-white/80' : isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                          <div className="flex items-center space-x-2.5">
+                            {renderSubcategoryIcon(subcategory, isSubSelected)}
+                            <h4 className={`font-medium text-sm leading-tight ${
+                              isSubSelected 
+                                ? isDarkMode ? 'text-white' : 'text-blue-700'
+                                : isDarkMode ? 'text-gray-300' : 'text-gray-700'
                             }`}>
-                              {subcategory.postCount || 0} Posts
-                            </span>
+                              {subcategory.name}
+                            </h4>
                           </div>
+                          <span className={`text-xs ${
+                            isSubSelected 
+                              ? isDarkMode ? 'text-blue-100' : 'text-blue-600'
+                              : isDarkMode ? 'text-gray-400' : 'text-gray-500'
+                          }`}>
+                            {(subcategory.postCount || 0).toLocaleString()}
+                          </span>
                         </div>
                       );
                     })}
