@@ -10,41 +10,18 @@ const PostCardActions = ({
   handleLike,
   handleCommentClick,
   handleShare,
-  likePostLoading
+  likePostLoading // This should now be specific to this post
 }) => {
 
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-4 sm:gap-6">
         <button
-          onClick={handleLike}
+          onClick={() => handleLike(postData.id)} // Pass the post ID
           disabled={likePostLoading}
-          className={`flex items-center cursor-pointer p-2 rounded transition-colors ${likePostLoading
-            ? 'opacity-50 cursor-not-allowed'
-            : isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'
-            }`}
+          className={`flex items-center cursor-pointer p-2 rounded transition-colors `}
         >
-          {likePostLoading ? (
-            // Loading spinner
-            <div className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} animate-spin`}>
-              <svg className="w-full h-full" viewBox="0 0 24 24">
-                <circle
-                  className="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  strokeWidth="4"
-                  fill="none"
-                />
-                <path
-                  className="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                />
-              </svg>
-            </div>
-          ) : postData.isLiked ? (
+          {postData.isLiked ? (
             <FaHeart className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} text-red-500`} />
           ) : (
             <FaRegHeart className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} ${isDarkMode ? 'text-gray-400' : 'text-gray-500'
