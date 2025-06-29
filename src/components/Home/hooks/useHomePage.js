@@ -1,7 +1,7 @@
+import { useGetPostQuery, useLikePostMutation } from '@/features/post/postApi';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useGetPostQuery, useLikePostMutation } from '@/features/post/postApi';
-import { formatPostData, extractUrlParams, createQueryParams } from '../utils/postUtils';
+import { createQueryParams, extractUrlParams, formatPostData } from '../utils/postUtils';
 
 export const useHomePage = () => {
   const pathname = usePathname();
@@ -24,7 +24,7 @@ export const useHomePage = () => {
 
   // API calls
   const { data: apiData, isLoading, error, refetch } = useGetPostQuery(queryParams);
-  const [likePost] = useLikePostMutation();
+  const [likePost, { isLoading: likePostLoading }] = useLikePostMutation();
 
   // Process API data
   const data = useMemo(() => {
@@ -56,7 +56,7 @@ export const useHomePage = () => {
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.delete('category');
     newParams.delete('subcategory');
-    
+
     if (categoryId) newParams.set('category', categoryId);
     if (subCategoryId) newParams.set('subcategory', subCategoryId);
     newParams.set('page', '1');
@@ -96,6 +96,7 @@ export const useHomePage = () => {
     handlePageChange,
     handleLike,
     clearAllFilters,
+    likePostLoading,
     refetch
   };
 };

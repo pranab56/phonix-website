@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Loading from '../../Loading/Loading';
 import PaginationControls from './PaginationControls';
 import PostsGrid from './PostsGrid';
@@ -10,11 +10,13 @@ const MainContent = ({
   gridNumber,
   onLike,
   onPageChange,
-  isLoading
+  isLoading,
+  likePostLoading
 }) => {
   const [isContentLoading, setIsContentLoading] = useState(false);
   const [displayPosts, setDisplayPosts] = useState([]);
   const [masonryColumns, setMasonryColumns] = useState([]);
+  const prevPostsRef = useRef([]);
 
   // Function to distribute posts into columns for masonry layout
   const distributePostsIntoColumns = (postsArray) => {
@@ -55,31 +57,62 @@ const MainContent = ({
     return height + 80; // Add padding and margins
   };
 
+  // Check if posts array has structurally changed (not just reactions)
+  const hasPostsStructureChanged = (newPosts, oldPosts) => {
+    // If this is the initial load (oldPosts is empty), always treat as structural change
+    if (oldPosts.length === 0 && newPosts.length > 0) return true;
+
+    if (newPosts.length !== oldPosts.length) return true;
+
+    // Check if post IDs are the same (assuming posts have an id field)
+    return newPosts.some((post, index) =>
+      !oldPosts[index] || post.id !== oldPosts[index].id
+    );
+  };
+
   useEffect(() => {
     if (!isLoading && posts.length > 0) {
-      // Start the 1-second loading delay when new posts arrive
-      setIsContentLoading(true);
-      setDisplayPosts([]); // Clear current posts during loading
-      setMasonryColumns([]);
+      const hasStructureChanged = hasPostsStructureChanged(posts, prevPostsRef.current);
 
-      const timer = setTimeout(() => {
+      if (hasStructureChanged) {
+        // Reduced loading delay for faster user experience
+        setIsContentLoading(true);
+        setDisplayPosts([]); // Clear current posts during loading
+        setMasonryColumns([]);
+
+        const timer = setTimeout(() => {
+          setDisplayPosts(posts);
+
+          // Set up masonry columns if gridNumber is 2
+          if (gridNumber === 2) {
+            const columns = distributePostsIntoColumns(posts);
+            setMasonryColumns(columns);
+          }
+
+          setIsContentLoading(false);
+          // Update the ref only after the timer completes successfully
+          prevPostsRef.current = posts;
+        }, 300); // Reduced from 1000ms to 300ms for faster loading
+
+        return () => clearTimeout(timer);
+      } else {
+        // For reaction updates, update posts immediately without loading delay
         setDisplayPosts(posts);
 
-        // Set up masonry columns if gridNumber is 2
         if (gridNumber === 2) {
           const columns = distributePostsIntoColumns(posts);
           setMasonryColumns(columns);
         }
 
-        setIsContentLoading(false);
-      }, 1000);
-
-      return () => clearTimeout(timer);
+        // Update the ref for reaction updates
+        prevPostsRef.current = posts;
+      }
     } else if (!isLoading && posts.length === 0) {
-      // Handle no posts case immediately
+      // Handle no posts case immediately - no delay
       setDisplayPosts([]);
       setMasonryColumns([]);
       setIsContentLoading(false);
+      prevPostsRef.current = [];
     }
   }, [posts, isLoading, gridNumber]);
 
@@ -92,7 +125,7 @@ const MainContent = ({
     );
   }
 
-  // Show loading during our 1-second delay
+  // Show loading during our reduced delay (only when there is data)
   if (isContentLoading) {
     return (
       <div className="flex justify-center items-center h-[400px]">
@@ -101,7 +134,7 @@ const MainContent = ({
     );
   }
 
-  // Show no posts message
+  // Show no posts message immediately when there's no data
   if (!displayPosts.length) {
     return (
       <div className="flex justify-center items-center h-[400px]">
@@ -120,6 +153,7 @@ const MainContent = ({
           currentUser={currentUser}
           gridNumber={gridNumber}
           onLike={onLike}
+          likePostLoading={likePostLoading}
         />
       ) : (
         // Two column masonry layout
@@ -131,6 +165,7 @@ const MainContent = ({
                 currentUser={currentUser}
                 gridNumber={1} // Pass 1 to ensure single column layout within each column
                 onLike={onLike}
+                likePostLoading={likePostLoading}
               />
             </div>
           ))}
@@ -146,6 +181,5 @@ const MainContent = ({
     </>
   );
 };
-
 
 export default MainContent;

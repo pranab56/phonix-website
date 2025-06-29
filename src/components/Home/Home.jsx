@@ -22,7 +22,8 @@ const HomePage = () => {
     handleSortChange,
     handlePageChange,
     handleLike,
-    clearAllFilters
+    clearAllFilters,
+    likePostLoading
   } = useHomePage();
 
   const { isDesktop, gridNumber, setGridNumber } = useLayout();
@@ -63,6 +64,7 @@ const HomePage = () => {
             onLike={handleLike}
             onClearFilters={clearAllFilters}
             isLoading={isLoading}
+            likePostLoading={likePostLoading}
           />
         ) : (
           <MobileLayout
@@ -78,6 +80,7 @@ const HomePage = () => {
             onLike={handleLike}
             onClearFilters={clearAllFilters}
             isLoading={isLoading}
+            likePostLoading={likePostLoading}
           />
         )}
       </main>

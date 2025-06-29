@@ -1,3 +1,5 @@
+'use client'
+
 import CategoriesSidebar from '../../CategoriesSidebar';
 import FeedNavigation from '../../FeedNavigation';
 import FilterIndicator from './FilterIndicator';
@@ -14,8 +16,9 @@ const DesktopLayout = ({
   onSortChange,
   onPageChange,
   onLike,
+  likePostLoading,
   onClearFilters,
-  isLoading
+  isLoading,
 }) => {
   const isGrid2 = gridNumber === 2;
 
@@ -50,6 +53,7 @@ const DesktopLayout = ({
           onLike={onLike}
           onPageChange={onPageChange}
           isLoading={isLoading}
+          likePostLoading={likePostLoading}
         />
       </section>
     </div>

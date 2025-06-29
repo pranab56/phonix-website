@@ -1,10 +1,11 @@
 import { useReportMutation } from '@/features/report/reportApi';
 import { ExclamationCircleOutlined, InfoCircleOutlined } from '@ant-design/icons';
 import { Alert, Button, Form, Input, Modal, Radio } from 'antd';
-import { useEffect, useState } from 'react';
-import { isAuthenticated } from '../../utils/auth';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { isAuthenticated } from '../../utils/auth';
 
 const { TextArea } = Input;
 
@@ -44,29 +45,29 @@ const ReportPostModal = ({ isOpen, onClose, postId }) => {
       // router.push('/auth/login');
       toast.error('please login first then send report');
       return;
-    }else{
- try {
-      const values = await form.validateFields();
-      const reason = {
-        reason: values.reportReason,
-        description: values.message,
-        postId: postId
-      };
-      const response = await report(reason).unwrap();
-      // Set success states
-      setSuccessMessage(response?.message || 'Report Send successfully!');
-      setIsSuccess(true);
-      // Reset form
-      form.resetFields();
-      // Close modal after 3 seconds to give user time to read message
-      setTimeout(() => {
-        handleClose();
-      }, 3000);
-    } catch (error) {
-      setSuccessMessage('Failed to submit report. Please try again later.');
-      setIsSuccess(false);
-      console.error('Report submission failed:', error);
-    }
+    } else {
+      try {
+        const values = await form.validateFields();
+        const reason = {
+          reason: values.reportReason,
+          description: values.message,
+          postId: postId
+        };
+        const response = await report(reason).unwrap();
+        // Set success states
+        setSuccessMessage(response?.message || 'Report Send successfully!');
+        setIsSuccess(true);
+        // Reset form
+        form.resetFields();
+        // Close modal after 3 seconds to give user time to read message
+        setTimeout(() => {
+          handleClose();
+        }, 3000);
+      } catch (error) {
+        setSuccessMessage('Failed to submit report. Please try again later.');
+        setIsSuccess(false);
+        console.error('Report submission failed:', error);
+      }
     }
   };
 
@@ -110,7 +111,7 @@ const ReportPostModal = ({ isOpen, onClose, postId }) => {
               message={
                 <span className="text-sm">
                   Help us maintain a safe community by reporting content that violates our{' '}
-                  <a href="#" className="text-blue-600 hover:underline font-medium">Community Guidelines</a>.
+                  <Link href="/terms-conditions" className="text-blue-600 hover:underline font-medium">Terms of Service</Link>.
                   All reports are confidential.
                 </span>
               }

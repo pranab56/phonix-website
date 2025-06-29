@@ -47,7 +47,7 @@ const PostDetailsPage = () => {
   } = usePostDetailsQuery(postId);
 
 
-  const [likePost] = useLikePostMutation();
+  const [likePost , {isLoading: likePostLoading}] = useLikePostMutation();
   const [savepost] = useSavepostMutation();
   const { data: savedPostsData } = useGetSaveAllPostQuery();
   const [createComment, { isLoading: createCommentLoading }] = useCreateCommentMutation();

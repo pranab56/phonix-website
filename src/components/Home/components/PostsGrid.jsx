@@ -1,17 +1,15 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Loading from '../../../components/Loading/Loading';
-import PostCard from '../../PostCard';
+
 import { useLayout } from '../hooks/useLayout';
+import PostCard from '../../PostCard/components/PostCard';
 
 
-const PostsGrid = ({ posts, currentUser, gridNumber, onLike, isLoading }) => {
+const PostsGrid = ({ posts, currentUser, gridNumber, onLike, isLoading, likePostLoading }) => {
   const postsContainerRef = useRef(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const { columnCount } = useLayout();
-
-
-  console.log(gridNumber)
 
   // Scroll handler with cleanup
   useEffect(() => {
@@ -73,6 +71,7 @@ const PostsGrid = ({ posts, currentUser, gridNumber, onLike, isLoading }) => {
               postData={post}
               currentUser={currentUser}
               onLike={onLike}
+              likePostLoading={likePostLoading}
               className="transition-transform duration-200 hover:scale-[1.01]"
             />
           ))}
