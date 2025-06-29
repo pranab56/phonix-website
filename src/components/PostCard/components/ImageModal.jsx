@@ -1,3 +1,7 @@
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { getImageUrl } from '../../../../utils/getImageUrl';
+
 const ImageModal = ({ images, currentIndex, onClose, onNext, onPrev, isDarkMode = false }) => {
   const [imageLoading, setImageLoading] = useState(true);
 
@@ -36,13 +40,13 @@ const ImageModal = ({ images, currentIndex, onClose, onNext, onPrev, isDarkMode 
 
   return (
     <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/40 backdrop-blur-lg"
       onClick={handleBackdropClick}
       style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
     >
       {/* Modal Container */}
       <div
-        className={`relative w-[90vw] max-w-4xl h-[90vh] max-h-[800px] ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+        className={`relative w-[40vw] max-w-4xl h-[50vh] max-h-[800px] ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
           } rounded-xl shadow-2xl overflow-hidden border`}
         onClick={(e) => e.stopPropagation()}
       >
