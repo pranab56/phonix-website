@@ -32,14 +32,14 @@ const EditPostModal = ({ visible, onClose, postData }) => {
       open={visible}
       onCancel={handleCancel}
       footer={null}
-      width={1000}
+      width={900}
       destroyOnClose={true}
       centered
       styles={{
         body: {
           maxHeight: '70vh',
           overflowY: 'auto',
-          padding: '20px',
+          padding: '0px',
           // Custom scrollbar styles
           scrollbarWidth: 'thin',
           scrollbarColor: '#888 #f1f1f1',

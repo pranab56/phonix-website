@@ -293,6 +293,7 @@ const ProfilePostCard = ({
   ];
 
   const author = postData.author || {};
+  console.log(postData)
   const commentsCount = postData.comments?.length || 0;
   const likesCount = postData.likes?.length || 0;
   const readsCount = postData.reads || 0;
@@ -388,7 +389,7 @@ const ProfilePostCard = ({
             >
               <Image
                 // src={isDarkMode ? "/icons/share_white.png" : "/icons/share.png"}
-               src={isDarkMode ? "/icons/sharedark.png" : "/icons/share.png"}
+                src={isDarkMode ? "/icons/sharedark.png" : "/icons/share.png"}
                 width={20}
                 height={20}
                 alt="share button"

@@ -58,6 +58,7 @@ const ProfilePage = () => {
 
   // Data preparation
   const userPosts = postsData?.data || [];
+  console.log("user post", userPosts)
   const savedPosts = savePostData?.data || [];
   const myComment = myCommentPost?.data || [];
 
@@ -228,7 +229,7 @@ const ProfilePage = () => {
     activeTabText: isDarkMode ? 'var(--active-tab-text)' : '#4338ca',
     iconColor: isDarkMode ? 'var(--icon-color)' : '#6b7280',
     activeTabBg: isDarkMode ? 'rgba(59, 130, 246, 0.2)' : '#e0e7ff',
-    activeTabText: isDarkMode ? '#93c5fd' : '#4338ca', 
+    activeTabText: isDarkMode ? '#93c5fd' : '#4338ca',
   };
 
   return (
@@ -256,42 +257,41 @@ const ProfilePage = () => {
               <Space direction="vertical" size="middle" className="w-full">
                 {tabs.map(({ key, icon, label }) => (
                   <button
-  key={key}
-  onClick={() => setActiveTab(key)}
-  className={`flex items-center justify-between w-full cursor-pointer p-3 rounded-md transition-all ${
-    activeTab === key
-      ? 'font-medium' // Make active tab text bolder
-      : `hover:bg-[${themeStyles.hoverBg}] text-[${themeStyles.textColor}]`
-  }`}
-  style={{
-    backgroundColor: activeTab === key ? themeStyles.activeTabBg : 'transparent',
-    color: activeTab === key ? themeStyles.activeTabText : themeStyles.textColor,
-    border: activeTab === key 
-      ? isDarkMode 
-        ? '1px solid rgba(59, 130, 246, 0.3)' 
-        : '1px solid rgba(67, 56, 202, 0.2)'
-      : 'none'
-  }}
->
-  <span className="flex items-center">
-    {React.cloneElement(icon, {
-      className: `mr-3`,
-      style: {
-        color: activeTab === key
-          ? themeStyles.activeTabText
-          : themeStyles.iconColor
-      }
-    })}
-    <span>{label}</span>
-  </span>
-  <span className="font-bold" style={{
-    color: activeTab === key
-      ? themeStyles.activeTabText
-      : themeStyles.textColor
-  }}>
-    {stats[key]}
-  </span>
-</button>
+                    key={key}
+                    onClick={() => setActiveTab(key)}
+                    className={`flex items-center justify-between w-full cursor-pointer p-3 rounded-md transition-all ${activeTab === key
+                        ? 'font-medium' // Make active tab text bolder
+                        : `hover:bg-[${themeStyles.hoverBg}] text-[${themeStyles.textColor}]`
+                      }`}
+                    style={{
+                      backgroundColor: activeTab === key ? themeStyles.activeTabBg : 'transparent',
+                      color: activeTab === key ? themeStyles.activeTabText : themeStyles.textColor,
+                      border: activeTab === key
+                        ? isDarkMode
+                          ? '1px solid rgba(59, 130, 246, 0.3)'
+                          : '1px solid rgba(67, 56, 202, 0.2)'
+                        : 'none'
+                    }}
+                  >
+                    <span className="flex items-center">
+                      {React.cloneElement(icon, {
+                        className: `mr-3`,
+                        style: {
+                          color: activeTab === key
+                            ? themeStyles.activeTabText
+                            : themeStyles.iconColor
+                        }
+                      })}
+                      <span>{label}</span>
+                    </span>
+                    <span className="font-bold" style={{
+                      color: activeTab === key
+                        ? themeStyles.activeTabText
+                        : themeStyles.textColor
+                    }}>
+                      {stats[key]}
+                    </span>
+                  </button>
                 ))}
               </Space>
             </Card>
