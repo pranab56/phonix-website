@@ -1,12 +1,15 @@
 import PostCard from '@/components/PostCard';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import Loading from '../../components/Loading/Loading';
+import Loading from '../../../components/Loading/Loading';
 import { useLayout } from '../hooks/useLayout';
 
 const PostsGrid = ({ posts, currentUser, gridNumber, onLike, isLoading }) => {
   const postsContainerRef = useRef(null);
   const [isScrolling, setIsScrolling] = useState(false);
   const { columnCount } = useLayout();
+
+
+  console.log(gridNumber)
 
   // Scroll handler with cleanup
   useEffect(() => {

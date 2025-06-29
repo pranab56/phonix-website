@@ -6,9 +6,62 @@ const CarouselBanner = () => {
   const [activeSlide, setActiveSlide] = useState(0);
   const [prevSlide, setPrevSlide] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [loadedImages, setLoadedImages] = useState(new Set());
+  const [loadingProgress, setLoadingProgress] = useState({});
   const { data, isLoading, isError } = useSilderQuery();
 
   const slides = data?.data || [];
+
+  // Simulate chunked loading progress
+  const simulateChunkedLoading = useCallback((imageIndex, imageUrl) => {
+    const chunks = 8; // Number of loading chunks
+    let currentChunk = 0;
+
+    const loadChunk = () => {
+      currentChunk++;
+      const progress = (currentChunk / chunks) * 100;
+
+      setLoadingProgress(prev => ({
+        ...prev,
+        [imageIndex]: progress
+      }));
+
+      if (currentChunk < chunks) {
+        // Random delay between 50-200ms for realistic loading feel
+        setTimeout(loadChunk, Math.random() * 150 + 50);
+      } else {
+        // Image fully loaded
+        setLoadedImages(prev => new Set([...prev, imageIndex]));
+        setLoadingProgress(prev => {
+          const newProgress = { ...prev };
+          delete newProgress[imageIndex];
+          return newProgress;
+        });
+      }
+    };
+
+    // Start loading simulation
+    setTimeout(loadChunk, 100);
+  }, []);
+
+  // Preload images with chunked loading simulation
+  useEffect(() => {
+    if (!slides.length) return;
+
+    slides.forEach((item, index) => {
+      if (!loadedImages.has(index)) {
+        const img = new Image();
+        img.onload = () => {
+          simulateChunkedLoading(index, `${baseURL}${item.image}`);
+        };
+        img.onerror = () => {
+          // Handle error - mark as loaded to prevent infinite loading
+          setLoadedImages(prev => new Set([...prev, index]));
+        };
+        img.src = `${baseURL}${item.image}`;
+      }
+    });
+  }, [slides, loadedImages, simulateChunkedLoading]);
 
   // Handle slide transition - extracted to a reusable function
   const changeSlide = useCallback((newIndex) => {
@@ -39,7 +92,7 @@ const CarouselBanner = () => {
     // Skip auto-slide if there's only one slide or none
     if (!slides.length || slides.length <= 1) return;
 
-    // Auto-slide every 5 seconds
+    // Auto-slide every 10 seconds
     const interval = setInterval(() => {
       const nextSlide = activeSlide === slides.length - 1 ? 0 : activeSlide + 1;
       changeSlide(nextSlide);
@@ -74,19 +127,78 @@ const CarouselBanner = () => {
           opacityClass = 'opacity-0';
         }
 
+        const isImageLoaded = loadedImages.has(index);
+        const loadingProgressValue = loadingProgress[index] || 0;
+
         return (
           <div
             key={index}
             className={`absolute inset-0 w-full h-full transition-all duration-700 ease-in-out transform ${opacityClass} ${positionClass}`}
           >
-            {/* Banner image with subtle zoom effect */}
+            {/* Banner image container */}
             <div className="absolute inset-0 w-full h-full px-3 sm:px-10 rounded-xl overflow-hidden">
-              <img
-                src={`${baseURL}${item.image}`}
-                alt={`Banner ${index + 1}`}
-                className="w-full h-full object-cover rounded-xl transition-transform duration-5000 ease-out"
-                style={{ transform: index === activeSlide ? 'scale(1.01)' : 'scale(1)' }}
-              />
+              {isImageLoaded ? (
+                // Fully loaded image with subtle zoom effect
+                <img
+                  src={`${baseURL}${item.image}`}
+                  alt={`Banner ${index + 1}`}
+                  className="w-full h-full object-cover rounded-xl transition-transform duration-5000 ease-out"
+                  style={{ transform: index === activeSlide ? 'scale(1.01)' : 'scale(1)' }}
+                />
+              ) : (
+                // Loading state with chunked progress
+                <div className="w-full h-full bg-gray-200 rounded-xl relative overflow-hidden">
+                  {/* Background skeleton */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 animate-pulse"></div>
+
+                  {/* Chunked loading visualization */}
+                  <div className="absolute inset-0 flex">
+                    {Array.from({ length: 8 }, (_, chunkIndex) => {
+                      const chunkProgress = Math.max(0, Math.min(100, loadingProgressValue - (chunkIndex * 12.5)));
+                      const chunkLoaded = chunkProgress >= 12.5;
+
+                      return (
+                        <div
+                          key={chunkIndex}
+                          className="flex-1 h-full relative overflow-hidden"
+                          style={{
+                            background: chunkLoaded
+                              ? `linear-gradient(to bottom, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%)`
+                              : 'transparent'
+                          }}
+                        >
+                          {/* Chunk loading animation */}
+                          <div
+                            className="absolute bottom-0 left-0 right-0 bg-blue-400 transition-all duration-300 ease-out"
+                            style={{
+                              height: `${Math.min(100, chunkProgress * 8)}%`,
+                              opacity: chunkLoaded ? 0.6 : 0.3
+                            }}
+                          ></div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Loading text and progress */}
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <div className="text-gray-600 text-sm font-medium mb-2">
+                        {/* Loading Image... */}
+                      </div>
+                      <div className="w-32 h-1 rounded-full overflow-hidden">
+                        <div
+                          className="h-full transition-all duration-300 ease-out"
+                          style={{ width: `${loadingProgressValue}%` }}
+                        ></div>
+                      </div>
+                      <div className="text-gray-500 text-xs mt-1">
+                        {Math.round(loadingProgressValue)}%
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         );
@@ -95,14 +207,25 @@ const CarouselBanner = () => {
       {/* Indicators - only show if more than one slide */}
       {slides.length > 1 && (
         <div className="absolute bottom-4 left-0 right-0 flex justify-center rounded-xl space-x-3">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => changeSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${activeSlide === index ? 'bg-white w-6' : 'bg-white/50 hover:bg-white/70'}`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
+          {slides.map((_, index) => {
+            const isImageLoaded = loadedImages.has(index);
+            return (
+              <button
+                key={index}
+                onClick={() => changeSlide(index)}
+                className={`w-2 h-2 rounded-full transition-all duration-300 relative ${activeSlide === index
+                  ? 'bg-white w-6'
+                  : 'bg-white/50 hover:bg-white/70'
+                  }`}
+                aria-label={`Go to slide ${index + 1}`}
+              >
+                {/* Loading indicator on dots */}
+                {!isImageLoaded && (
+                  <div className="absolute inset-0 rounded-full border border-white/30 animate-pulse"></div>
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
