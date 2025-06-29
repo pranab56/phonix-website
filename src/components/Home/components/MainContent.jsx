@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
+import Loading from '../../Loading/Loading';
 import PaginationControls from './PaginationControls';
 import PostsGrid from './PostsGrid';
-import Loading from '../../Loading/Loading';
 
 const MainContent = ({
   posts,

@@ -1,7 +1,9 @@
-import PostCard from '@/components/PostCard';
+
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Loading from '../../../components/Loading/Loading';
+import PostCard from '../../PostCard';
 import { useLayout } from '../hooks/useLayout';
+
 
 const PostsGrid = ({ posts, currentUser, gridNumber, onLike, isLoading }) => {
   const postsContainerRef = useRef(null);
