@@ -41,7 +41,7 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId }) =
   return (
     <div className={`min-h-screen py-4 sm:py-8 px-2 sm:px-4 transition-colors duration-200 ${isDarkMode ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'
       }`}>
-      <div className="max-w-4xl mx-auto">
+      <div className="w-full mx-auto">
         <Card
           className={`rounded-xl shadow-lg border-0 overflow-hidden transition-colors duration-200 ${isEditing ? 'border-0 shadow-none' : ''
             } ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}

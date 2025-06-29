@@ -222,7 +222,7 @@ const ProfileBanner = () => {
             <Input disabled className={isDarkMode ? 'bg-gray-600 text-gray-300 border-gray-500' : ''} />
           </Form.Item>
 
-          <Form.Item
+          {/* <Form.Item
             name="contact"
             label={<span className={isDarkMode ? 'text-white' : ''}>Phone</span>}
             rules={[
@@ -233,7 +233,7 @@ const ProfileBanner = () => {
               placeholder='Phone Number'
               className={isDarkMode ? 'bg-gray-600 text-white border-gray-500' : ''}
             />
-          </Form.Item>
+          </Form.Item> */}
 
           <Form.Item>
             <Button

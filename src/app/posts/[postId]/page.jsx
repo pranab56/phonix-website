@@ -23,10 +23,9 @@ import ReportPostModal from '@/components/ReportPostModal';
 
 // Utils
 import { useGetProfileQuery } from '@/features/profile/profileApi';
-import { baseURL } from '../../../../utils/BaseURL';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { getImageUrl } from '../../../../utils/getImageUrl';
 import { ThemeContext } from '../../ClientLayout';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 
 const PostDetailsPage = () => {
@@ -35,7 +34,7 @@ const PostDetailsPage = () => {
   const { postId } = params;
   const { isDarkMode } = useContext(ThemeContext); // Get dark mode state from context
   const [showImageModal, setShowImageModal] = useState(false);
-    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const commentInputRef = useRef(null);
 
@@ -47,7 +46,7 @@ const PostDetailsPage = () => {
   } = usePostDetailsQuery(postId);
 
 
-  const [likePost , {isLoading: likePostLoading}] = useLikePostMutation();
+  const [likePost, { isLoading: likePostLoading }] = useLikePostMutation();
   const [savepost] = useSavepostMutation();
   const { data: savedPostsData } = useGetSaveAllPostQuery();
   const [createComment, { isLoading: createCommentLoading }] = useCreateCommentMutation();
@@ -56,7 +55,7 @@ const PostDetailsPage = () => {
   const [replayComment, { isLoading: replayCommentLoading }] = useReplayCommentMutation();
   const [editComment, { isLoading: editCommentLoading }] = useUpdateCommentMutation();
   const { data: profile } = useGetProfileQuery();
-    const [showRepliesFor, setShowRepliesFor] = useState({});
+  const [showRepliesFor, setShowRepliesFor] = useState({});
 
   const [commentText, setCommentText] = useState('');
   const [editingCommentId, setEditingCommentId] = useState(null);
@@ -95,29 +94,29 @@ const PostDetailsPage = () => {
   }, []);
 
 
-  
+
   const handleImageClick = useCallback((index) => {
-        console.log('Image clicked, index:', index); // Debug log
-        setCurrentImageIndex(index);
-        setShowImageModal(true);
-      }, []);
+    console.log('Image clicked, index:', index); // Debug log
+    setCurrentImageIndex(index);
+    setShowImageModal(true);
+  }, []);
 
 
-        const handleNextImage = useCallback(() => {
-          setCurrentImageIndex((prev) =>
-            prev === post?.images?.length - 1 ? 0 : prev + 1
-          );
-        }, [post?.images?.length]);
-      
-        const handlePrevImage = useCallback(() => {
-          setCurrentImageIndex((prev) =>
-            prev === 0 ? post?.images?.length - 1 : prev - 1
-          );
-        }, [post?.images?.length]);
-      
-        const handleCloseModal = useCallback(() => {
-          setShowImageModal(false);
-        }, []);
+  const handleNextImage = useCallback(() => {
+    setCurrentImageIndex((prev) =>
+      prev === post?.images?.length - 1 ? 0 : prev + 1
+    );
+  }, [post?.images?.length]);
+
+  const handlePrevImage = useCallback(() => {
+    setCurrentImageIndex((prev) =>
+      prev === 0 ? post?.images?.length - 1 : prev - 1
+    );
+  }, [post?.images?.length]);
+
+  const handleCloseModal = useCallback(() => {
+    setShowImageModal(false);
+  }, []);
 
   const formatDate = (timestamp) => {
     if (!timestamp) return "Just now";
@@ -326,165 +325,165 @@ const PostDetailsPage = () => {
 
 
   const ImageModal = ({ images, currentIndex, onClose, onNext, onPrev, isDarkMode = false }) => {
-  const [imageLoading, setImageLoading] = useState(true);
+    const [imageLoading, setImageLoading] = useState(true);
 
-  const handleBackdropClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
-  };
-
-  const handleKeyDown = useCallback((e) => {
-    if (e.key === 'Escape') {
-      onClose();
-    } else if (e.key === 'ArrowRight' && images.length > 1) {
-      onNext();
-    } else if (e.key === 'ArrowLeft' && images.length > 1) {
-      onPrev();
-    }
-  }, [onClose, onNext, onPrev, images.length]);
-
-  useEffect(() => {
-    document.addEventListener('keydown', handleKeyDown);
-    document.body.style.overflow = 'hidden'; // Prevent background scroll
-
-    return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'unset'; // Restore scroll
+    const handleBackdropClick = (e) => {
+      if (e.target === e.currentTarget) {
+        onClose();
+      }
     };
-  }, [handleKeyDown]);
 
-  // Reset loading state when image changes
-  useEffect(() => {
-    setImageLoading(true);
-  }, [currentIndex]);
+    const handleKeyDown = useCallback((e) => {
+      if (e.key === 'Escape') {
+        onClose();
+      } else if (e.key === 'ArrowRight' && images.length > 1) {
+        onNext();
+      } else if (e.key === 'ArrowLeft' && images.length > 1) {
+        onPrev();
+      }
+    }, [onClose, onNext, onPrev, images.length]);
 
-  if (!images || images.length === 0) return null;
+    useEffect(() => {
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden'; // Prevent background scroll
 
-  return (
-    <div
-      className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
-      onClick={handleBackdropClick}
-      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
-    >
-      {/* Modal Container */}
+      return () => {
+        document.removeEventListener('keydown', handleKeyDown);
+        document.body.style.overflow = 'unset'; // Restore scroll
+      };
+    }, [handleKeyDown]);
+
+    // Reset loading state when image changes
+    useEffect(() => {
+      setImageLoading(true);
+    }, [currentIndex]);
+
+    if (!images || images.length === 0) return null;
+
+    return (
       <div
-        className={`relative w-[90vw] max-w-4xl h-[90vh] max-h-[800px] ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
-          } rounded-xl shadow-2xl overflow-hidden border`}
-        onClick={(e) => e.stopPropagation()}
+        className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/80 backdrop-blur-sm"
+        onClick={handleBackdropClick}
+        style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0 }}
       >
-        {/* Header with close button and counter */}
+        {/* Modal Container */}
         <div
-          className={`flex justify-between items-center p-4 border-b ${isDarkMode
+          className={`relative w-[90vw] max-w-4xl h-[90vh] max-h-[800px] ${isDarkMode ? 'bg-gray-900 border-gray-700' : 'bg-white border-gray-200'
+            } rounded-xl shadow-2xl overflow-hidden border`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header with close button and counter */}
+          <div
+            className={`flex justify-between items-center p-4 border-b ${isDarkMode
               ? 'bg-gray-800 border-gray-700 text-gray-200'
               : 'bg-gray-50 border-gray-200 text-gray-800'
-            }`}
-        >
-          {images.length > 1 && (
-            <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
-              }`}>
-              {currentIndex + 1} / {images.length}
-            </div>
-          )}
-          <div className="flex-1"></div>
-          <button
-            onClick={onClose}
-            className={`p-2 cursor-pointer rounded-full transition-colors ${isDarkMode
+              }`}
+          >
+            {images.length > 1 && (
+              <div className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-600'
+                }`}>
+                {currentIndex + 1} / {images.length}
+              </div>
+            )}
+            <div className="flex-1"></div>
+            <button
+              onClick={onClose}
+              className={`p-2 cursor-pointer rounded-full transition-colors ${isDarkMode
                 ? 'hover:bg-gray-700 text-gray-300 hover:text-white'
                 : 'hover:bg-gray-200 text-gray-500 hover:text-gray-700'
-              }`}
-            aria-label="Close modal"
-          >
-            <X size={20} />
-          </button>
-        </div>
+                }`}
+              aria-label="Close modal"
+            >
+              <X size={20} />
+            </button>
+          </div>
 
-        {/* Image Container */}
-        <div className="relative flex-1 flex items-center justify-center" style={{ height: 'calc(100% - 80px)' }}>
-          {imageLoading && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className={`animate-spin rounded-full h-12 w-12 border-4 border-t-transparent ${isDarkMode ? 'border-gray-400' : 'border-gray-600'
-                }`}></div>
-            </div>
-          )}
+          {/* Image Container */}
+          <div className="relative flex-1 flex items-center justify-center" style={{ height: 'calc(100% - 80px)' }}>
+            {imageLoading && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className={`animate-spin rounded-full h-12 w-12 border-4 border-t-transparent ${isDarkMode ? 'border-gray-400' : 'border-gray-600'
+                  }`}></div>
+              </div>
+            )}
 
-          <img
-            src={getImageUrl(images[currentIndex])}
-            alt={`Image ${currentIndex + 1}`}
-            className={`max-w-full max-h-full object-contain transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'
-              }`}
-            onLoad={() => setImageLoading(false)}
-            onError={() => {
-              setImageLoading(false);
-              console.error('Failed to load image:', images[currentIndex]);
-            }}
-            style={{ maxHeight: '100%', maxWidth: '100%' }}
-          />
+            <img
+              src={getImageUrl(images[currentIndex])}
+              alt={`Image ${currentIndex + 1}`}
+              className={`max-w-full max-h-full object-contain transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'
+                }`}
+              onLoad={() => setImageLoading(false)}
+              onError={() => {
+                setImageLoading(false);
+                console.error('Failed to load image:', images[currentIndex]);
+              }}
+              style={{ maxHeight: '100%', maxWidth: '100%' }}
+            />
 
-          {/* Navigation Arrows - Only show if multiple images */}
-          {images.length > 1 && (
-            <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onPrev();
-                }}
-                className={`absolute cursor-pointer left-4 p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-105 ${isDarkMode
+            {/* Navigation Arrows - Only show if multiple images */}
+            {images.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPrev();
+                  }}
+                  className={`absolute cursor-pointer left-4 p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-105 ${isDarkMode
                     ? 'bg-gray-800/90 hover:bg-gray-700 text-white border border-gray-600'
                     : 'bg-white/90 hover:bg-white text-gray-700 border border-gray-300'
-                  }`}
-                aria-label="Previous image"
-              >
-                <ChevronLeft size={24} />
-              </button>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onNext();
-                }}
-                className={`absolute cursor-pointer right-4 p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-105 ${isDarkMode
+                    }`}
+                  aria-label="Previous image"
+                >
+                  <ChevronLeft size={24} />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onNext();
+                  }}
+                  className={`absolute cursor-pointer right-4 p-3 rounded-full shadow-lg transition-all duration-200 hover:scale-105 ${isDarkMode
                     ? 'bg-gray-800/90 hover:bg-gray-700 text-white border border-gray-600'
                     : 'bg-white/90 hover:bg-white text-gray-700 border border-gray-300'
-                  }`}
-                aria-label="Next image"
-              >
-                <ChevronRight size={24} />
-              </button>
-            </>
-          )}
-        </div>
+                    }`}
+                  aria-label="Next image"
+                >
+                  <ChevronRight size={24} />
+                </button>
+              </>
+            )}
+          </div>
 
-        {/* Footer with dots indicator */}
-        {images.length > 1 && images.length <= 10 && (
-          <div className={`flex justify-center items-center p-4 space-x-2 ${isDarkMode
+          {/* Footer with dots indicator */}
+          {images.length > 1 && images.length <= 10 && (
+            <div className={`flex justify-center items-center p-4 space-x-2 ${isDarkMode
               ? 'bg-gray-800 border-gray-700'
               : 'bg-gray-50 border-gray-200'
-            }`}>
-            {images.map((_, index) => (
-              <button
-                key={index}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  const diff = index - currentIndex;
-                  if (diff > 0) {
-                    for (let i = 0; i < diff; i++) onNext();
-                  } else if (diff < 0) {
-                    for (let i = 0; i < Math.abs(diff); i++) onPrev();
-                  }
-                }}
-                className={`w-3 h-3 rounded-full transition-all duration-200 ${index === currentIndex
+              }`}>
+              {images.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const diff = index - currentIndex;
+                    if (diff > 0) {
+                      for (let i = 0; i < diff; i++) onNext();
+                    } else if (diff < 0) {
+                      for (let i = 0; i < Math.abs(diff); i++) onPrev();
+                    }
+                  }}
+                  className={`w-3 h-3 rounded-full transition-all duration-200 ${index === currentIndex
                     ? (isDarkMode ? 'bg-blue-400' : 'bg-blue-500')
                     : (isDarkMode ? 'bg-gray-600 hover:bg-gray-500' : 'bg-gray-300 hover:bg-gray-400')
-                  }`}
-                aria-label={`Go to image ${index + 1}`}
-              />
-            ))}
-          </div>
-        )}
+                    }`}
+                  aria-label={`Go to image ${index + 1}`}
+                />
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  };
 
 
 
@@ -522,234 +521,224 @@ const PostDetailsPage = () => {
     else if (key === 'report') setShowReportModal(true);
   };
 
-const renderCommentMenu = (comment) => {
-  const isCurrentUserComment = comment.author?._id === login_user_id;
+  const renderCommentMenu = (comment) => {
+    const isCurrentUserComment = comment.author?._id === login_user_id;
 
-  return (
-    <Menu className={isDarkMode ? 'bg-gray-800 text-gray-200' : ''}>
-      {isCurrentUserComment && (
-        <>
-          <Menu.Item 
-            key="edit" 
-            onClick={() => {
-              setEditingCommentId(comment._id);
-              setEditCommentText(comment.content);
-            }}
-            icon={<EditOutlined />}
-          >
-            Edit Comment
-          </Menu.Item>
-          <Menu.Item 
-            key="delete" 
-            onClick={() => handleDeleteComment(comment._id)}
-            icon={<DeleteOutlined />}
-            danger
-          >
-            Delete Comment
-          </Menu.Item>
-        </>
-      )}
-      {!isCurrentUserComment && (
-        <Menu.Item key="report">Report Comment</Menu.Item>
-      )}
-    </Menu>
-  );
-};
-
-
-
-
- const renderComment = (comment) => {
-  if (!comment) return null;
-
-  const isEditing = editingCommentId === comment._id;
-  const isCommentLiked = comment.likes?.includes(login_user_id);
-  const commentAuthor = comment.author || { userName: "Unknown" };
-  const authorImage = commentAuthor.profile || commentAuthor.avatar;
-  
-  // State for showing/hiding replies
-
-
-  return (
-    <div key={comment._id} className="w-full mb-4">
-      {/* Main Comment */}
-      <div className={`flex w-full ${isDarkMode ? 'dark-mode' : ''}`}>
-        {/* User Avatar */}
-        <div className="mr-4 flex-shrink-0">
-          {authorImage ? (
-            <Avatar src={getImageUrl(authorImage)} size={40} />
-          ) : (
-            <Avatar size={40}>{commentAuthor.userName?.charAt(0).toUpperCase() || 'U'}</Avatar>
-          )}
-        </div>
-
-        {/* Comment Content */}
-         {/* Comment Content */}
-        <div className="flex-1 w-full">
-          {/* Comment Header */}
-          <div className="flex items-start justify-between mb-1">
-            <div>
-              <span className={`font-medium text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
-                {commentAuthor.userName}
-              </span>
-              <span className={`text-xs ml-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                {formatDate(comment.createdAt)}
-              </span>
-            </div>
-            
-            <div className="ml-auto">
-              <Dropdown
-                overlay={renderCommentMenu(comment)}
-                trigger={['click']}
-                placement="bottomRight"
-              >
-                <Button
-                  type="text"
-                  icon={<EllipsisOutlined className={isDarkMode ? 'text-gray-300' : ''} />}
-                  className={`${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
-                />
-              </Dropdown>
-            </div>
-          </div>
-
-          {/* Comment Text */}
-          {isEditing ? (
-            <div className="my-2">
-              <Input.TextArea
-                value={editCommentText}
-                onChange={(e) => setEditCommentText(e.target.value)}
-                autoSize={{ minRows: 2, maxRows: 6 }}
-                className={isDarkMode ? 'bg-gray-700 text-gray-200 border-gray-600' : ''}
-              />
-              <div className="flex justify-end mt-2">
-                <Button
-                  onClick={() => setEditingCommentId(null)}
-                  className={`mr-2 ${isDarkMode ? 'bg-gray-700 text-gray-200 border-gray-600 hover:bg-gray-600' : ''}`}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="primary"
-                  onClick={() => handleUpdateComment(comment._id)}
-                  disabled={!editCommentText.trim() || editCommentLoading}
-                  loading={editCommentLoading && editingCommentId === comment._id}
-                >
-                  Update
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2 whitespace-pre-wrap`}>
-              {comment.content}
-            </p>
-          )}
-
-          {/* Comment Actions */}
-          <div className="flex items-center mt-1">
-            <button
-              className={`flex items-center cursor-pointer mr-4 px-2 py-1 rounded-full ${isDarkMode ? 'text-gray-400 hover:text-blue-400' : 'hover:text-blue-500'}`}
-              onClick={() => handleCommentLike(comment._id)}
-              disabled={likeCommentLoading}
-            >
-              {isCommentLiked ? (
-                <FaHeart className="mr-1 text-red-500" />
-              ) : (
-                <FaRegHeart className="mr-1" />
-              )}
-              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : ''}`}>{comment.likes?.length || 0}</span>
-            </button>
-
-            <button
-              className={`flex items-center cursor-pointer px-2 py-1 rounded-full ${isDarkMode ? 'text-gray-400 hover:text-blue-400' : 'hover:text-blue-500'}`}
-              onClick={() => setReplyingTo(replyingTo === comment._id ? null : comment._id)}
-            >
-              <MessageOutlined className="mr-1" />
-              <span className={`text-xs ${isDarkMode ? 'text-gray-300' : ''}`}>Reply</span>
-            </button>
-          </div>
-
-          {/* Reply Input */}
-          {replyingTo === comment._id && (
-            <div className="mt-3">
-              <Input.TextArea
-                placeholder="Write your reply..."
-                value={replyText}
-                onChange={(e) => setReplyText(e.target.value)}
-                autoSize={{ minRows: 1, maxRows: 4 }}
-                className={isDarkMode ? 'bg-gray-700 text-gray-200 border-gray-600' : ''}
-              />
-              <div className="flex gap-2 mt-2">
-                <Button
-                  onClick={() => setReplyingTo(null)}
-                  className={isDarkMode ? 'bg-gray-700 text-gray-200 border-gray-600 hover:bg-gray-600' : ''}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  type="primary"
-                  onClick={() => handleReplySubmit(comment._id)}
-                  loading={replayCommentLoading}
-    
-                >
-                  Reply
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Replies Toggle Button */}
-      {comment.replies?.length > 0 && (
-        <>
-          <div className="ml-12 mt-1 mb-2">
-            <button 
-              className={`flex items-center cursor-pointer ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}
+    return (
+      <Menu className={isDarkMode ? 'bg-gray-800 text-gray-200' : ''}>
+        {isCurrentUserComment && (
+          <>
+            <Menu.Item
+              key="edit"
               onClick={() => {
-                // Toggle showing replies for this comment
-                setShowRepliesFor(prevState => ({
-                  ...prevState,
-                  [comment._id]: !prevState[comment._id]
-                }));
+                setEditingCommentId(comment._id);
+                setEditCommentText(comment.content);
               }}
+              icon={<EditOutlined />}
             >
-              {showRepliesFor[comment._id] ? (
-                <>
-                  <FaChevronUp className="mr-2 text-xs" />
-                  <span className="text-xs">Hide replies</span>
-                </>
-              ) : (
-                <>
-                  <FaChevronDown className="mr-2 text-xs" />
-                  <span className="text-xs">{comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}</span>
-                </>
-              )}
-            </button>
+              Edit Comment
+            </Menu.Item>
+            <Menu.Item
+              key="delete"
+              onClick={() => handleDeleteComment(comment._id)}
+              icon={<DeleteOutlined />}
+              danger
+            >
+              Delete Comment
+            </Menu.Item>
+          </>
+        )}
+        {!isCurrentUserComment && (
+          <Menu.Item key="report">Report Comment</Menu.Item>
+        )}
+      </Menu>
+    );
+  };
+
+
+
+
+  const renderComment = (comment) => {
+    if (!comment) return null;
+
+    const isEditing = editingCommentId === comment._id;
+    const isCommentLiked = comment.likes?.includes(login_user_id);
+    const commentAuthor = comment.author || { userName: "Unknown" };
+    const authorImage = commentAuthor.profile || commentAuthor.avatar;
+
+    // State for showing/hiding replies
+
+
+    return (
+      <div key={comment._id} className="w-full mb-4">
+        {/* Main Comment */}
+        <div className={`flex w-full ${isDarkMode ? 'dark-mode' : ''}`}>
+          {/* User Avatar */}
+          <div className="mr-4 flex-shrink-0">
+            {authorImage ? (
+              <Avatar src={getImageUrl(authorImage)} size={40} />
+            ) : (
+              <Avatar size={40}>{commentAuthor.userName?.charAt(0).toUpperCase() || 'U'}</Avatar>
+            )}
           </div>
-          
-          {/* Show Replies only when toggled */}
-          {showRepliesFor[comment._id] && (
-            <div className={` mt-2 pl-3`}>
-              {sortComments(comment.replies).map(reply =>
-                renderComment(reply)
-              )}
+
+          {/* Comment Content */}
+          {/* Comment Content */}
+          <div className="flex-1 w-full">
+            {/* Comment Header */}
+            <div className="flex items-start justify-between -mb-1">
+              <div>
+                <span className={`font-medium text-sm ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
+                  {commentAuthor.userName}
+                </span>
+                <span className={`text-xs ml-2 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {formatDate(comment.createdAt)}
+                </span>
+              </div>
+
+              <div className="ml-auto">
+                <Dropdown
+                  overlay={renderCommentMenu(comment)}
+                  trigger={['click']}
+                  placement="bottomRight"
+                >
+                  <Button
+                    type="text"
+                    icon={<EllipsisOutlined className={isDarkMode ? 'text-gray-300' : ''} />}
+                    className={`${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                  />
+                </Dropdown>
+              </div>
             </div>
-          )}
-        </>
-      )}
-    </div>
-  );
-};
 
+            {/* Comment Text */}
+            {isEditing ? (
+              <div className="my-2">
+                <Input.TextArea
+                  value={editCommentText}
+                  onChange={(e) => setEditCommentText(e.target.value)}
+                  autoSize={{ minRows: 2, maxRows: 6 }}
+                  className={isDarkMode ? 'bg-gray-700 text-gray-200 border-gray-600' : ''}
+                />
+                <div className="flex justify-end mt-2">
+                  <Button
+                    onClick={() => setEditingCommentId(null)}
+                    className={`mr-2 ${isDarkMode ? 'bg-gray-700 text-gray-200 border-gray-600 hover:bg-gray-600' : ''}`}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="primary"
+                    onClick={() => handleUpdateComment(comment._id)}
+                    disabled={!editCommentText.trim() || editCommentLoading}
+                    loading={editCommentLoading && editingCommentId === comment._id}
+                  >
+                    Update
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <p className={`text-sm ${isDarkMode ? 'text-gray-300' : 'text-gray-700'} mb-2 whitespace-pre-wrap`}>
+                {comment.content}
+              </p>
+            )}
 
+            {/* Comment Actions */}
+            <div className="flex items-center mt-1">
+              <button
+                className={`flex items-center cursor-pointer mr-4 px-2 py-1 rounded-full ${isDarkMode ? 'text-gray-400 hover:text-blue-400' : 'hover:text-blue-500'}`}
+                onClick={() => handleCommentLike(comment._id)}
+                disabled={likeCommentLoading}
+              >
+                {isCommentLiked ? (
+                  <FaHeart className="mr-1 text-red-500" />
+                ) : (
+                  <FaRegHeart className="mr-1" />
+                )}
+                <span className={`text-xs ${isDarkMode ? 'text-gray-300' : ''}`}>{comment.likes?.length || 0}</span>
+              </button>
 
+              <button
+                className={`flex items-center cursor-pointer px-2 py-1 rounded-full ${isDarkMode ? 'text-gray-400 hover:text-blue-400' : 'hover:text-blue-500'}`}
+                onClick={() => setReplyingTo(replyingTo === comment._id ? null : comment._id)}
+              >
+                <MessageOutlined className="mr-1" />
+                <span className={`text-xs ${isDarkMode ? 'text-gray-300' : ''}`}>Reply</span>
+              </button>
+            </div>
 
+            {/* Reply Input */}
+            {replyingTo === comment._id && (
+              <div className="mt-3">
+                <Input.TextArea
+                  placeholder="Write your reply..."
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  autoSize={{ minRows: 1, maxRows: 4 }}
+                  className={isDarkMode ? 'bg-gray-700 text-gray-200 border-gray-600' : ''}
+                />
+                <div className="flex gap-2 mt-2">
+                  <Button
+                    onClick={() => setReplyingTo(null)}
+                    className={isDarkMode ? 'bg-gray-700 text-gray-200 border-gray-600 hover:bg-gray-600' : ''}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    type="primary"
+                    onClick={() => handleReplySubmit(comment._id)}
+                    loading={replayCommentLoading}
 
+                  >
+                    Reply
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
 
+        {/* Replies Toggle Button */}
+        {comment.replies?.length > 0 && (
+          <>
+            <div className="ml-12 mt-1 mb-2">
+              <button
+                className={`flex items-center cursor-pointer ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}
+                onClick={() => {
+                  // Toggle showing replies for this comment
+                  setShowRepliesFor(prevState => ({
+                    ...prevState,
+                    [comment._id]: !prevState[comment._id]
+                  }));
+                }}
+              >
+                {showRepliesFor[comment._id] ? (
+                  <>
+                    <FaChevronUp className="mr-2 text-xs" />
+                    <span className="text-xs">Hide replies</span>
+                  </>
+                ) : (
+                  <>
+                    <FaChevronDown className="mr-2 text-xs" />
+                    <span className="text-xs">{comment.replies.length} {comment.replies.length === 1 ? 'reply' : 'replies'}</span>
+                  </>
+                )}
+              </button>
+            </div>
 
-
-
-
+            {/* Show Replies only when toggled */}
+            {showRepliesFor[comment._id] && (
+              <div className={` mt-2 pl-3`}>
+                {sortComments(comment.replies).map(reply =>
+                  renderComment(reply)
+                )}
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
+  };
 
 
   if (isLoading) {
@@ -796,7 +785,7 @@ const renderCommentMenu = (comment) => {
             src={getImageUrl(post.images[0])}
             alt="Post content 1"
             className="w-1/2 h-full cursor-pointer object-cover"
-             onClick={() => handleImageClick(0)}
+            onClick={() => handleImageClick(0)}
           />
           <img
             src={getImageUrl(post.images[1])}
@@ -839,11 +828,11 @@ const renderCommentMenu = (comment) => {
                 alt={`Post content ${index + 1}`}
                 className={`w-full h-full object-cover ${index === 3 && post.images.length > 4 ? 'opacity-80' : ''
                   }`}
-                  onClick={() => handleImageClick(index)}
+                onClick={() => handleImageClick(index)}
               />
               {index === 3 && post.images.length > 4 && (
                 <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-2xl font-bold"
-                onClick={() => handleImageClick(index)}
+                  onClick={() => handleImageClick(index)}
                 >
                   +{post.images.length - 4}
                 </div>
@@ -854,8 +843,6 @@ const renderCommentMenu = (comment) => {
       ) : null}
     </div>
   ) : null;
-
-
 
 
 
@@ -961,7 +948,7 @@ const renderCommentMenu = (comment) => {
           <div className="flex gap-3 items-center">
             {login_user_id ? (
               currentUser.avatar ? (
-               <Avatar src={getImageUrl(profile?.data?.profile)} size={32} />
+                <Avatar src={getImageUrl(profile?.data?.profile)} size={32} />
               ) : (
                 <Avatar size={32}>{currentUser.name?.charAt(0).toUpperCase() || 'U'}</Avatar>
               )
@@ -1024,7 +1011,7 @@ const renderCommentMenu = (comment) => {
         </div>
       </main>
 
-         {showImageModal && post?.images && post?.images.length > 0 && (
+      {showImageModal && post?.images && post?.images.length > 0 && (
         <ImageModal
           images={post?.images.map(img => getImageUrl(img))}
           currentIndex={currentImageIndex}
