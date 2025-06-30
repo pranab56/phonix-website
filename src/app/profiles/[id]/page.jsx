@@ -2,15 +2,15 @@
 import AuthorPostCard from '@/components/AuthorPostCard';
 import { useCreateChatMutation } from '@/features/chat/massage';
 import { useGetByUserIdQuery, useGetProfileByIdQuery, useLikePostMutation } from '@/features/post/postApi';
-import { Grid, Spin } from 'antd';
+import { Grid } from 'antd';
 import Image from 'next/image';
 import { useParams, useRouter } from 'next/navigation';
 import { useContext } from 'react';
 import toast from 'react-hot-toast';
-import { getImageUrl } from '../../../../utils/getImageUrl';
-import { ThemeContext } from '../../ClientLayout';
 import { isAuthenticated } from '../../../../utils/auth';
+import { getImageUrl } from '../../../../utils/getImageUrl';
 import Loading from '../../../components/Loading/Loading';
+import { ThemeContext } from '../../ClientLayout';
 
 
 const ProfileBanner = () => {
@@ -37,7 +37,7 @@ const ProfileBanner = () => {
     if (!isAuthenticated()) {
       router.push('/auth/login');
       return;
-    }else{
+    } else {
       try {
         const response = await createChat({ participant: id }).unwrap();
         console.log(response)
@@ -72,7 +72,7 @@ const ProfileBanner = () => {
               className={`
               ${isMobile ? 'px-3 py-1.5 rounded-md' : 'px-4 py-2 rounded-md'}
               bg-primary transition-colors cursor-pointer
-              text-white flex items-center justify-center gap-2
+             ${isDarkMode ? 'text-white' : 'text-black'}  flex items-center justify-center gap-2
               shadow-sm
             `}
               aria-label="Edit profile"

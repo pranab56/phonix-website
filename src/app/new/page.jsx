@@ -30,7 +30,7 @@ const JoditEditor = dynamic(() => import('jodit-react'), {
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
 
-const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId }) => {
+const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, refetchPosts, myCommentPostRefetch }) => {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState(null);
   const [subcategory, setSubcategory] = useState(null);
@@ -78,6 +78,34 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId }) =
     buttonsSM: ['bold', 'italic', 'underline', '|', 'ul', 'ol'],
     buttonsXS: ['bold', 'italic', 'underline', '|', 'ul', 'ol'],
     extraPlugins: ['list'],
+
+    // Paste configuration - THIS FIXES THE DIALOG ISSUE
+    askBeforePasteHTML: false,
+    askBeforePasteFromWord: false,
+    defaultActionOnPaste: 'insert_clear_html',
+    processPasteHTML: true,
+    processPasteFromWord: true,
+
+    // Additional paste settings
+    pasteHTMLActionList: [
+      { value: 'insert_as_html', text: 'Insert as HTML' },
+      { value: 'insert_as_text', text: 'Insert as Text' },
+      { value: 'insert_clear_html', text: 'Insert without formatting' }
+    ],
+
+    // Paste filters
+    beautifyHTML: false,
+    cleanHTML: {
+      timeout: 300,
+      removeEmptyElements: true,
+      fillEmptyParagraph: false,
+      replaceNBSP: true,
+      replaceOldTags: {
+        'i': 'em',
+        'b': 'strong'
+      }
+    },
+
     style: {
       padding: "20px",
       backgroundColor: isDarkMode ? '#1f2937' : '#fff',
@@ -93,6 +121,27 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId }) =
     toolbarSticky: true,
     showCharsCounter: true,
     showWordsCounter: true,
+
+    // Events to handle paste behavior
+    events: {
+      beforePaste: function (event) {
+        // Optional: You can add custom logic here
+        return true;
+      },
+      afterPaste: function (event) {
+        // Clean up any unwanted formatting after paste
+        const editor = this;
+        setTimeout(() => {
+          // Ensure ordered lists maintain decimal numbering
+          const orderedLists = editor.editor.querySelectorAll('ol');
+          orderedLists.forEach(ol => {
+            if (!ol.hasAttribute('type')) {
+              ol.style.listStyleType = 'decimal';
+            }
+          });
+        }, 100);
+      }
+    }
   }), [isMobile, isDarkMode]);
 
   useEffect(() => {
@@ -100,40 +149,50 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId }) =
       const style = document.createElement('style');
       style.id = 'jodit-dark-mode-styles';
       style.innerHTML = `
-        .jodit-container.jodit-dark-theme,
-        .jodit-container.jodit-dark-theme .jodit-workplace,
-        .jodit-container.jodit-dark-theme .jodit-wysiwyg {
-          background-color: #1f2937 !important;
-          color: #e5e7eb !important;
-        }
-        .jodit-dark-theme .jodit-toolbar__box {
-          background-color: #374151 !important;
-          border-color: #4b5563 !important;
-        }
-        .jodit-dark-theme .jodit-toolbar {
-          background-color: #374151 !important;
-          border-color: #4b5563 !important;
-        }
-        .jodit-dark-theme .jodit-wysiwyg {
-          color: #e5e7eb !important;
-        }
-        .dark-editor .jodit-container {
-          border-color: #4b5563 !important;
-        }
-        /* Toolbar styling */
-        .jodit-toolbar__box {
-          flex-wrap: nowrap !important;
-          overflow-x: auto !important;
-        }
-        .jodit-toolbar-button {
-          flex-shrink: 0 !important;
-        }
-        /* Force ol with decimal numbers */
-        .jodit-wysiwyg ol {
-          list-style-type: decimal !important;
-          padding-left: 20px !important;
-        }
-      `;
+            .jodit-container.jodit-dark-theme,
+            .jodit-container.jodit-dark-theme .jodit-workplace,
+            .jodit-container.jodit-dark-theme .jodit-wysiwyg {
+                background-color: #1f2937 !important;
+                color: #e5e7eb !important;
+            }
+            .jodit-dark-theme .jodit-toolbar__box {
+                background-color: #374151 !important;
+                border-color: #4b5563 !important;
+            }
+            .jodit-dark-theme .jodit-toolbar {
+                background-color: #374151 !important;
+                border-color: #4b5563 !important;
+            }
+            .jodit-dark-theme .jodit-wysiwyg {
+                color: #e5e7eb !important;
+            }
+            .dark-editor .jodit-container {
+                border-color: #4b5563 !important;
+            }
+            /* Toolbar styling */
+            .jodit-toolbar__box {
+                flex-wrap: nowrap !important;
+                overflow-x: auto !important;
+            }
+            .jodit-toolbar-button {
+                flex-shrink: 0 !important;
+            }
+            /* Force ol with decimal numbers */
+            .jodit-wysiwyg ol {
+                list-style-type: decimal !important;
+                padding-left: 20px !important;
+            }
+            
+            /* Hide paste dialog if it still appears */
+            .jodit-dialog[data-editor-id] .jodit-dialog__panel .jodit-dialog__content {
+                display: none !important;
+            }
+            
+            /* Additional paste-related styling */
+            .jodit-paste-storage {
+                display: none !important;
+            }
+        `;
       document.head.appendChild(style);
       return () => {
         const existingStyle = document.getElementById('jodit-dark-mode-styles');
@@ -369,8 +428,14 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId }) =
       const response = isEditing && postId
         ? await editPost({ id: postId, body: formData }).unwrap()
         : await createPost(formData).unwrap();
+      console.log(response);
 
+      if (isEditing && response.success) {
+        refetchPosts();
+        myCommentPostRefetch()
+      }
       toast.success(isEditing ? 'Post updated successfully' : 'Post created successfully');
+
 
       if (!isEditing) {
         router.push('/');

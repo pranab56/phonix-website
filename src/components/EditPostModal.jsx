@@ -3,7 +3,7 @@ import BlogPostForm from '@/app/new/page';
 import { Modal } from 'antd';
 import { useEffect } from 'react';
 
-const EditPostModal = ({ visible, onClose, postData }) => {
+const EditPostModal = ({ visible, onClose, postData, refetchPosts , myCommentPostRefetch }) => {
   // Disable body scroll when modal is open
   useEffect(() => {
     if (visible) {
@@ -86,6 +86,8 @@ const EditPostModal = ({ visible, onClose, postData }) => {
           isEditing={true}
           onSuccess={handleUpdateSuccess}
           postId={postData?.id || postData?._id}
+          refetchPosts={refetchPosts}
+          myCommentPostRefetch={myCommentPostRefetch}
         />
       )}
     </Modal>

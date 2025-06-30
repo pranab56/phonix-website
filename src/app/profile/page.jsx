@@ -8,7 +8,7 @@ import { Button, Card, Form, Grid, Input, message, Modal, Space } from 'antd';
 import { formatDistanceToNow } from 'date-fns';
 import React, { useContext, useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
-import { FiBookmark, FiFile, FiMessageSquare } from 'react-icons/fi';
+import { FiBookmark, FiFile, FiGrid, FiList, FiMessageSquare } from 'react-icons/fi';
 import { ThemeContext } from '../ClientLayout';
 
 
@@ -26,7 +26,7 @@ const ProfilePage = () => {
     refetch: refetchSavedPosts
   } = useGetSaveAllPostQuery();
 
-  const { data: myCommentPost, isLoading: myCommentPostLoading } = useMyCommentPostQuery();
+  const { data: myCommentPost, isLoading: myCommentPostLoading, refetch: myCommentPostRefetch } = useMyCommentPostQuery();
 
   const [deletePost] = useDeletePostMutation();
   const [savepost, { isLoading: isUnsaving }] = useSavepostMutation();
@@ -34,6 +34,9 @@ const ProfilePage = () => {
   // State management
   const [activeTab, setActiveTab] = useState(() =>
     typeof window !== 'undefined' ? localStorage.getItem('profileActiveTab') || 'totalPosts' : 'totalPosts'
+  );
+  const [isGridView, setIsGridView] = useState(() =>
+    typeof window !== 'undefined' ? localStorage.getItem('profileGridView') === 'true' : false
   );
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -49,6 +52,13 @@ const ProfilePage = () => {
       localStorage.setItem('profileActiveTab', activeTab);
     }
   }, [activeTab]);
+
+  // Store grid view preference in localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('profileGridView', isGridView.toString());
+    }
+  }, [isGridView]);
 
   // Error handling
   useEffect(() => {
@@ -100,31 +110,21 @@ const ProfilePage = () => {
 
   // Handle post actions
   const handleEditPost = (postId) => {
+    console.log("postId", postId);
     const postToEdit = userPosts.find(post => post._id === postId);
     if (postToEdit) {
       setEditingPost(postToEdit);
+      refetchPosts();
+      myCommentPostRefetch()
       form.setFieldsValue({
         title: postToEdit.title,
         content: postToEdit.content?.replace(/<[^>]*>/g, '') || ''
       });
       setIsEditModalOpen(true);
     }
+
   };
 
-  const handleEditFormSubmit = async (values) => {
-    if (!editingPost) return;
-
-    try {
-      // API call would go here
-      setIsEditModalOpen(false);
-      setEditingPost(null);
-      form.resetFields();
-      message.success('Post updated successfully');
-      refetchPosts();
-    } catch (error) {
-      message.error('Failed to update post');
-    }
-  };
 
   const handleConfirmDelete = async () => {
     if (!postToDelete) return;
@@ -146,6 +146,7 @@ const ProfilePage = () => {
   const handleOptionSelect = (postId, option) => {
     if (option === 'edit') {
       handleEditPost(postId);
+
     } else if (option === 'delete') {
       setPostToDelete(postId);
       setIsDeleteModalOpen(true);
@@ -190,6 +191,10 @@ const ProfilePage = () => {
     }
   };
 
+  // Toggle grid view
+  const toggleGridView = () => {
+    setIsGridView(!isGridView);
+  };
 
   // Get posts based on active tab
   const getPostsToDisplay = () => {
@@ -298,12 +303,28 @@ const ProfilePage = () => {
 
           {/* Posts Feed */}
           <section className={`${screens.md ? screens.lg ? 'w-3/4' : 'w-2/3' : 'w-full'}`}>
-            <div className="mb-6 ">
-              <h2 className="text-xl  font-semibold" style={{ color: themeStyles.textColor }}>
+            {/* Header with Grid View Toggle */}
+            <div className="mb-6 flex items-center justify-between">
+              <h2 className="text-xl font-semibold" style={{ color: themeStyles.textColor }}>
                 {activeTab === 'totalPosts' && 'Your Posts'}
                 {activeTab === 'savedPosts' && 'Saved Posts'}
                 {activeTab === 'comments' && 'Your Comments'}
               </h2>
+
+              {/* Grid View Toggle Button */}
+              <Button
+                type="text"
+                icon={isGridView ? <FiList size={18} /> : <FiGrid size={18} />}
+                onClick={toggleGridView}
+                className={`flex items-center justify-center gap-2 border px-3 py-2 rounded-md transition-all ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                style={{
+                  backgroundColor: 'transparent',
+                  color: themeStyles.textColor,
+                  border: `1px solid gray`,
+                }}
+              >
+                <span className='-mt-1.5 font-semibold'>{isGridView ? 'List View' : 'Grid View'}</span>
+              </Button>
             </div>
 
             {isLoading ? (
@@ -317,7 +338,7 @@ const ProfilePage = () => {
                 <p style={{ color: themeStyles.textColor }}>Loading...</p>
               </div>
             ) : postsToDisplay.length > 0 ? (
-              <div className="flex flex-col gap-4">
+              <div className={`${isGridView ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'flex flex-col gap-4'}`}>
                 {postsToDisplay.map((post) => (
                   <ProfilePostCard
                     key={`${post.isSavedPost ? 'saved-' : ''}${post._id}`}
@@ -325,6 +346,8 @@ const ProfilePage = () => {
                     onLike={handleLike}
                     onOptionSelect={handleOptionSelect}
                     onUnsave={handleUnsave}
+                    refetchPosts={refetchPosts}
+                    myCommentPostRefetch={myCommentPostRefetch}
                     isDarkMode={isDarkMode}
                   />
                 ))}
@@ -349,7 +372,7 @@ const ProfilePage = () => {
       </main>
 
       {/* Edit Post Modal */}
-      <Modal
+      {/* <Modal
         title="Edit Post"
         open={isEditModalOpen}
         onCancel={() => {
@@ -425,7 +448,7 @@ const ProfilePage = () => {
             <Button type="primary" htmlType="submit">Save Changes</Button>
           </div>
         </Form>
-      </Modal>
+      </Modal> */}
 
       {/* Delete Confirmation Modal */}
       <Modal

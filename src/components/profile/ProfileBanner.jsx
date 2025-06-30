@@ -1,7 +1,7 @@
 "use client";
 import { useGetProfileQuery, useUpdateProfileMutation } from '@/features/profile/profileApi';
 import { PlusOutlined } from '@ant-design/icons';
-import { Button, Col, Form, Grid, Input, message, Modal, Row, Spin, Upload } from 'antd';
+import { Button, Col, Form, Grid, Input, message, Modal, Row, Upload } from 'antd';
 import { useContext, useEffect, useState } from 'react';
 import { getImageUrl } from '../../../utils/getImageUrl';
 import { ThemeContext } from '../../app/ClientLayout';
@@ -101,7 +101,7 @@ const ProfileBanner = () => {
   if (profileLoading) {
     return (
       <div className={`pt-20 pb-10 flex items-center justify-center ${isDarkMode ? 'bg-gray-800' : 'bg-[#EBEBFF]'}`}>
-          <Loading />
+        <Loading />
       </div>
     );
   }
@@ -135,16 +135,16 @@ const ProfileBanner = () => {
             className={`
               ${isMobile ? 'px-3 py-1.5 rounded-md' : 'px-4 py-2 rounded-md'}
               bg-primary transition-colors cursor-pointer
-              text-white flex items-center justify-center gap-4
+              text-black flex items-center justify-center gap-4
               shadow-sm
             `}
             aria-label="Edit profile"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M9.99952 10L3.84252 16.162C3.60992 16.3944 3.43819 16.6805 3.34252 16.995L2.02052 21.355C1.9943 21.4415 1.99202 21.5335 2.01392 21.6212C2.03583 21.7089 2.08109 21.789 2.1449 21.853C2.20871 21.917 2.28869 21.9626 2.37631 21.9847C2.46394 22.0069 2.55593 22.0049 2.64252 21.979L7.00052 20.656C7.31399 20.5599 7.59902 20.3882 7.83052 20.156L13.9995 13.982" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M12.8291 7.17153L17.1881 2.82553C17.4498 2.5638 17.7605 2.35619 18.1025 2.21455C18.4445 2.0729 18.811 2 19.1811 2C19.5512 2 19.9177 2.0729 20.2597 2.21455C20.6017 2.35619 20.9124 2.5638 21.1741 2.82553C21.4358 3.08725 21.6434 3.39796 21.7851 3.73992C21.9267 4.08188 21.9996 4.44839 21.9996 4.81853C21.9996 5.18866 21.9267 5.55517 21.7851 5.89713C21.6434 6.23909 21.4358 6.5498 21.1741 6.81153L16.8211 11.1645" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M15 5L19 9" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-              <path d="M2 2L22 22" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="black">
+              <path d="M9.99952 10L3.84252 16.162C3.60992 16.3944 3.43819 16.6805 3.34252 16.995L2.02052 21.355C1.9943 21.4415 1.99202 21.5335 2.01392 21.6212C2.03583 21.7089 2.08109 21.789 2.1449 21.853C2.20871 21.917 2.28869 21.9626 2.37631 21.9847C2.46394 22.0069 2.55593 22.0049 2.64252 21.979L7.00052 20.656C7.31399 20.5599 7.59902 20.3882 7.83052 20.156L13.9995 13.982" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M12.8291 7.17153L17.1881 2.82553C17.4498 2.5638 17.7605 2.35619 18.1025 2.21455C18.4445 2.0729 18.811 2 19.1811 2C19.5512 2 19.9177 2.0729 20.2597 2.21455C20.6017 2.35619 20.9124 2.5638 21.1741 2.82553C21.4358 3.08725 21.6434 3.39796 21.7851 3.73992C21.9267 4.08188 21.9996 4.44839 21.9996 4.81853C21.9996 5.18866 21.9267 5.55517 21.7851 5.89713C21.6434 6.23909 21.4358 6.5498 21.1741 6.81153L16.8211 11.1645" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M15 5L19 9" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M2 2L22 22" stroke="black" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span className="text-base font-medium">Edit Profile</span>
           </button>

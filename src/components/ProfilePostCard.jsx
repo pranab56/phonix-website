@@ -22,7 +22,9 @@ const ProfilePostCard = ({
   onOptionSelect,
   onUnsave,
   currentUser = { name: "User", avatar: "" },
-  isDarkMode
+  isDarkMode,
+  refetchPosts,
+  myCommentPostRefetch
 }) => {
   const router = useRouter();
   const [windowSize, setWindowSize] = useState({
@@ -97,12 +99,12 @@ const ProfilePostCard = ({
     }
   };
 
-  const handleReportSubmit = (values) => {
-    console.log('Report submitted:', values);
-    toast.success('Report submitted successfully');
-    setReportModalVisible(false);
-    reportForm.resetFields();
-  };
+  // const handleReportSubmit = (values) => {
+  //   console.log('Report submitted:', values);
+  //   toast.success('Report submitted successfully');
+  //   setReportModalVisible(false);
+  //   reportForm.resetFields();
+  // };
 
   const renderAuthorAvatar = () => {
     const author = postData?.author || {};
@@ -400,6 +402,8 @@ const ProfilePostCard = ({
         onClose={() => setEditModalVisible(false)}
         postData={postData}
         isDarkMode={isDarkMode}
+        refetchPosts={refetchPosts}
+        myCommentPostRefetch={myCommentPostRefetch}
       />
 
       <ReportPostModal

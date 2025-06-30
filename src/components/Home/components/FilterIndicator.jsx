@@ -35,7 +35,7 @@ const FilterIndicator = ({ urlParams, posts, onClearFilters }) => {
             </span>
           )}
         </div>
-        <Button type="link" onClick={onClearFilters}>
+        <Button style={{ color: "#1919e0" }} type="link" onClick={onClearFilters}>
           Clear All Filters
         </Button>
       </div>
