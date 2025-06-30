@@ -58,7 +58,6 @@ const ProfilePage = () => {
 
   // Data preparation
   const userPosts = postsData?.data || [];
-  console.log("user post", userPosts)
   const savedPosts = savePostData?.data || [];
   const myComment = myCommentPost?.data || [];
 
@@ -260,8 +259,8 @@ const ProfilePage = () => {
                     key={key}
                     onClick={() => setActiveTab(key)}
                     className={`flex items-center justify-between w-full cursor-pointer p-3 rounded-md transition-all ${activeTab === key
-                        ? 'font-medium' // Make active tab text bolder
-                        : `hover:bg-[${themeStyles.hoverBg}] text-[${themeStyles.textColor}]`
+                      ? 'font-medium' // Make active tab text bolder
+                      : `hover:bg-[${themeStyles.hoverBg}] text-[${themeStyles.textColor}]`
                       }`}
                     style={{
                       backgroundColor: activeTab === key ? themeStyles.activeTabBg : 'transparent',

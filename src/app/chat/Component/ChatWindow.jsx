@@ -1,15 +1,17 @@
 'use client';
 import { useDeleteMessageMutation, useGetAllChatQuery, useGetAllMassageQuery, useMessageSendMutation, useReactMessageMutation } from '@/features/chat/massage';
+import { CaretRightOutlined } from '@ant-design/icons';
 import { Avatar, Badge, Button, Dropdown, Form, Input, Tooltip, Upload } from 'antd';
 import EmojiPicker from 'emoji-picker-react';
 import { useContext, useEffect, useRef, useState } from 'react';
 import { BsEmojiSmile } from 'react-icons/bs';
 import { FiMoreVertical } from 'react-icons/fi';
-import { IoIosAttach, IoMdSend } from 'react-icons/io';
+import { IoMdSend } from 'react-icons/io';
 import { TbTrash } from 'react-icons/tb';
 import { useSelector } from 'react-redux';
 import { getImageUrl } from '../../../../utils/getImageUrl';
 import { ThemeContext } from '../../ClientLayout';
+import { ImageUplaod } from '../../../../utils/svgImage';
 
 const ChatWindow = ({ id }) => {
   // Use refetchOnMountOrArgChange to ensure data is fresh when component mounts
@@ -449,15 +451,17 @@ const ChatWindow = ({ id }) => {
           <div className="flex items-center">
             <Form.Item name="file" valuePropName="file" className="mb-0 mr-1">
               <Upload
-                beforeUpload={() => false}
+                beforeUpload={() => false} // Disable automatic upload
                 accept="image/*"
                 maxCount={1}
                 showUploadList={false}
                 onChange={handleFileChange}
+                customRequest={() => { }} // Optional: to prevent automatic upload behavior
+                iconRender={() => <ImageUplaod />}
               >
                 <Button
                   type="text"
-                  icon={<IoIosAttach color={isDarkMode ? "#9BA3AF" : "#9F9F9F"} size={24} />}
+                  icon={<ImageUplaod />}
                   className="flex items-center justify-center"
                 />
               </Upload>

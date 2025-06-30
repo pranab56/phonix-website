@@ -34,9 +34,6 @@ const ProfilePostCard = ({
   // console.log(postData);
 
   const loginUserPost = postData?.author?._id === localStorage.getItem("login_user_id");
-  console.log(loginUserPost);
-
-  console.log(postData.images);
   const [editModalVisible, setEditModalVisible] = useState(false);
   const [reportModalVisible, setReportModalVisible] = useState(false);
   const [reportForm] = Form.useForm();
@@ -293,7 +290,6 @@ const ProfilePostCard = ({
   ];
 
   const author = postData.author || {};
-  console.log(postData)
   const commentsCount = postData.comments?.length || 0;
   const likesCount = postData.likes?.length || 0;
   const readsCount = postData.reads || 0;
@@ -306,7 +302,7 @@ const ProfilePostCard = ({
             {renderAuthorAvatar()}
             <div className="flex flex-col items-start">
               <span className={`font-medium ${isMobile ? 'text-xs' : 'text-base'} ${isDarkMode ? 'text-gray-200' : 'text-gray-900'}`}>
-                {author.userName || author.name || "User"}
+                {author.name ? author.name : author.username}
               </span>
               <span className={`${isMobile ? 'text-xs' : 'text-sm'} ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
                 {postData.isSavedPost

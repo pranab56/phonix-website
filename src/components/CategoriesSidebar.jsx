@@ -109,16 +109,9 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
 
   if (categoryLoading) {
     return (
-      <div className={`rounded-2xl p-6 ${isDarkMode ? 'bg-gray-800' : 'bg-white'
-        } shadow-sm border border-gray-200 dark:border-gray-700`}>
-        <h2 className={`text-xl font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'
-          }`}>
-          Categories
-        </h2>
-        <div className="flex justify-center py-5">
-          <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
-        </div>
-      </div>
+      <>
+        <div className="w-full h-full bg-gray-200 animate-pulse rounded-xl"></div>
+      </>
     );
   }
 
