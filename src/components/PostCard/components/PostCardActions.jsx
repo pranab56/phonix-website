@@ -19,8 +19,7 @@ const PostCardActions = ({
         <button
           onClick={() => handleLike(postData.id)} // Pass the post ID
           disabled={likePostLoading}
-          className={`flex items-center cursor-pointer p-2 rounded transition-colors `}
-        >
+          className={`flex items-center cursor-pointer p-2 rounded transition-colors `} >
           {postData.isLiked ? (
             <FaHeart className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'} text-red-500`} />
           ) : (
