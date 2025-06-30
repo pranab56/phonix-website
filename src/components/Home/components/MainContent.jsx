@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Loading from '../../Loading/Loading';
 import PaginationControls from './PaginationControls';
 import PostsGrid from './PostsGrid';
+import { FileText } from 'lucide-react';
 
 const MainContent = ({
   posts,
@@ -137,8 +138,27 @@ const MainContent = ({
   // Show no posts message immediately when there's no data
   if (!displayPosts.length) {
     return (
-      <div className="flex justify-center items-center h-[400px]">
-        <h1>No posts found</h1>
+      <div className="max-w-md mx-auto sm:mt-20 mt-10 text-center">
+      {/* Icon Container */}
+      <div className="relative mb-3">
+        <div className="w-20 h-20 mx-auto bg-white rounded-full shadow-lg flex items-center justify-center relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-purple-100 opacity-50"></div>
+          <FileText className="w-10 h-10 text-slate-400 relative z-10" strokeWidth={1.5} />
+        </div>
+        {/* Floating Elements */}
+        <div className="absolute top-4 right-8 w-6 h-6 bg-blue-200 rounded-full opacity-60 animate-pulse"></div>
+        <div className="absolute bottom-8 left-4 w-4 h-4 bg-purple-200 rounded-full opacity-40 animate-pulse delay-500"></div>
+      </div>
+
+      {/* Main Content */}
+      <div className="space-y-4 mb-8">
+        <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
+          No Posts Found
+        </h2>
+        <p className="text-slate-600 text-md leading-relaxed">
+          It looks like there aren't any posts here yet. Be the first to share something amazing!
+        </p>
+      </div>
       </div>
     );
   }

@@ -335,7 +335,7 @@ const ProfilePostCard = ({
         {postData.title && (
           <h2
             onClick={handlePostDetails}
-            className={`${isMobile ? 'text-lg' : isTablet ? 'text-xl' : 'text-2xl'} cursor-pointer ${isDarkMode ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'} font-bold mb-3`}
+            className={`${isMobile ? 'text-lg' : isTablet ? 'text-xl' : 'text-2xl'} cursor-pointer ${isDarkMode ? 'text-white hover:text-blue-300' : 'text-black hover:text-blue-800'} font-bold mb-3`}
           >
             {postData.title}
           </h2>
