@@ -414,7 +414,7 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId }) =
               />
             </div>
           )}
-          <div className={`py-4 sm:p-6 ${isDarkMode ? 'dark-editor' : ''}`}>
+          <div className={`${!isEditing && 'py-4 sm:p-6'} ${isDarkMode ? 'dark-editor' : ''}`}>
             {/* Title Input */}
             <div className="mb-6 sm:mb-8">
               <Title level={5} className={`mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>

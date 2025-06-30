@@ -259,6 +259,9 @@ const SignUp = () => {
               <Link href="/auth/login" className="text-indigo-600 hover:text-indigo-500 font-medium">
                 Sign in
               </Link>
+              <div className="mt-2">
+                Need help? <a href="mailto:mehorhelp@gmail.com" className="text-indigo-600 hover:text-indigo-500">mehorhelp@gmail.com</a>
+              </div>
             </div>
           </div>
         </div>

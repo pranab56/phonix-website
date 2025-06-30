@@ -67,8 +67,8 @@ const ChatList = ({ setIsChatActive, status }) => {
   }
 
   return (
-    <div className={`w-full h-[80vh] shadow rounded-lg flex flex-col
-      ${isDarkMode ? 'dark-mode bg-gray-800 border-gray-700' : 'light-mode bg-white border-gray-200'}`}>
+    <div className={`w-full h-[80vh]  rounded-lg flex flex-col
+      ${isDarkMode ? 'dark-mode bg-gray-800 border-gray-700' : ' bg-[#f9f9f9] shadow-lg border-gray-700'}`}>
 
       <div className="p-4 ">
         <Flex gap={8}>

@@ -17,7 +17,7 @@ const ChatWindow = ({ id }) => {
     refetchOnMountOrArgChange: true,
     pollingInterval: 3000 // Poll every 3 seconds for updates
   });
-  
+
   const { messages } = useSelector((state) => state.message);
   const [sendMessage, { isLoading }] = useMessageSendMutation();
   const [messageReact] = useReactMessageMutation();
@@ -246,15 +246,15 @@ const ChatWindow = ({ id }) => {
         <h3 className={`font-medium ${isDarkMode ? 'text-white' : ''}`}>
           {users?.participants?.length > 0
             ? users.participants.map((participant, idx) => (
-                <h3 key={idx}>{participant.userName}</h3>
-              ))
+              <h3 key={idx}>{participant.userName}</h3>
+            ))
             : "Chat Participants"
           }
         </h3>
       </div>
 
       {/* Message container */}
-      <div 
+      <div
         ref={messagesContainerRef}
         className={`flex-1 p-4 overflow-y-auto message-container ${isDarkMode ? 'bg-gray-800' : 'bg-[#f9f9f9]'}`}
       >
@@ -301,12 +301,12 @@ const ChatWindow = ({ id }) => {
 
               <div className="relative group ">
                 <div className={`message-bubble max-w-xs p-3 rounded-2xl ${isDeleted
-                    ? 'deleted-message'
-                    : isCurrentUser
-                      ? 'bg-[#f2f2f2] text-black'
-                      : isDarkMode
-                        ? 'bg-gray-700 text-gray-200'
-                        : 'bg-white text-gray-800'
+                  ? 'deleted-message'
+                  : isCurrentUser
+                    ? 'bg-[#f2f2f2] text-black'
+                    : isDarkMode
+                      ? 'bg-gray-700 text-gray-200'
+                      : 'bg-white text-gray-800'
                   } shadow-sm`}>
                   <p className={`${isDeleted ? "text-red-500" : ""}`}>{message.text}</p>
 
@@ -503,7 +503,7 @@ const ChatWindow = ({ id }) => {
             <Button
               htmlType="submit"
               type="primary"
-              icon={<IoMdSend style={{ fontSize: '27px', paddingLeft: '3px' , paddingtop: '3px' }} />}
+              icon={<IoMdSend style={{ fontSize: '27px', paddingLeft: '3px', paddingtop: '3px' }} />}
               shape="circle"
               size="large"
               style={{
