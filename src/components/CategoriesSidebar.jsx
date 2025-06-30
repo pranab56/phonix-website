@@ -1,12 +1,12 @@
 "use client";
 
 import { useCategoriesQuery } from '@/features/Category/CategoriesApi';
+import { UnorderedListOutlined } from '@ant-design/icons';
 import { ChevronDown } from 'lucide-react';
 import Image from 'next/image';
 import { useContext, useMemo, useState } from 'react';
 import { baseURL } from '../../utils/BaseURL';
 import { ThemeContext } from '../app/ClientLayout';
-import { UnorderedListOutlined } from '@ant-design/icons';
 
 const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCategory }) => {
   const [expandedCategories, setExpandedCategories] = useState({});
@@ -32,10 +32,19 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
     const category = categories.find(item => item.category._id === categoryId);
     const hasSubcategories = category?.subcategories?.length > 0;
 
+    console.log('Selecting category:', categoryId, 'Category name:', category?.name);
+    console.log('Has subcategories:', hasSubcategories);
+    console.log('Current selectedCategory:', selectedCategory);
+
+    // Always select the category first
     onSelectCategory(categoryId, "");
 
+    // For categories with subcategories, toggle expansion after a small delay
+    // This prevents state conflict between selection and expansion
     if (hasSubcategories) {
-      toggleCategory(categoryId);
+      setTimeout(() => {
+        toggleCategory(categoryId);
+      }, 0);
     }
   };
 
@@ -53,7 +62,7 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
 
     return imageUrl ? (
       <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 ${isSelected
-        ? 'bg-blue-500 shadow-sm'
+        ? ' shadow-sm'
         : isDarkMode
           ? 'bg-gray-700'
           : 'bg-gray-100'
@@ -68,7 +77,7 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
       </div>
     ) : (
       <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 ${isSelected
-        ? 'bg-blue-500 text-white shadow-sm'
+        ? '  shadow-sm'
         : isDarkMode
           ? 'bg-gray-700 text-gray-300'
           : 'bg-gray-100 text-gray-600'
@@ -106,7 +115,7 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
           }`}>
           Categories
         </h2>
-        <div className="flex justify-center py-8">
+        <div className="flex justify-center py-5">
           <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-blue-500"></div>
         </div>
       </div>
@@ -125,7 +134,7 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
         {/* All Posts Button */}
         <div
           onClick={handleShowAllPosts}
-          className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 ${!selectedCategory && !selectedSubCategory
+          className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all duration-200 ${!selectedCategory && !selectedSubCategory
             ? isDarkMode
               ? 'bg-blue-600 text-white'
               : 'bg-blue-50 text-blue-700 border border-blue-200'
@@ -154,18 +163,20 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
         </div>
 
         {/* Categories List */}
-        {categories.map((item) => {
+        {categories.map((item, index) => {
           const category = item.category;
           const subcategories = item.subcategories || [];
           const hasSubcategories = subcategories.length > 0;
           const isExpanded = expandedCategories[category._id];
           const isSelected = selectedCategory === category._id && !selectedSubCategory;
 
+          console.log(`Category ${index + 1}:`, category.name, 'ID:', category._id, 'Selected:', isSelected);
+
           return (
             <div key={category._id}>
               <div
                 onClick={() => selectCategory(category._id)}
-                className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-all duration-200 ${isSelected
+                className={`flex items-center justify-between p-2 rounded-lg cursor-pointer transition-all duration-200 ${isSelected
                   ? isDarkMode
                     ? 'bg-blue-600 text-white'
                     : 'bg-blue-50 text-blue-700 border border-blue-200'
@@ -205,13 +216,13 @@ const CategoriesSidebar = ({ onSelectCategory, selectedCategory, selectedSubCate
               {/* Subcategories */}
               {hasSubcategories && (
                 <div
-                  className={` transition-all duration-700 ease-out m ${isExpanded
+                  className={`overflow-hidden  transition-all duration-700 ease-out  ${isExpanded
                     ? 'opacity-100 mt-2 pb-2'
                     : 'opacity-0 mt-0'
                     }`}
                   style={{
-                    maxHeight: isExpanded ? `${subcategories.length * 48 + 8}px` : '0px',
-                    transition: 'max-height 700ms cubic-bezier(0.4, 0, 0.2, 1), opacity 700ms cubic-bezier(0.4, 0, 0.2, 1), margin-top 700ms cubic-bezier(0.4, 0, 0.2, 1)'
+                    maxHeight: isExpanded ? `${subcategories.length * 48 + 22}px` : '0px',
+                    transition: 'max-height 700ms cubic-bezier(0.4, 0, 0.2, 1), opacity 700ms cubic-bezier(0.4, 0, 0.2, 1), margin-top 1000ms cubic-bezier(0.4, 0, 0.2, 1)'
                   }}
                 >
                   <div className="ml-4 space-y-1">
