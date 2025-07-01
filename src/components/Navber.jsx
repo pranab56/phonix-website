@@ -72,7 +72,6 @@ export default function Navbar() {
     (isDarkMode && item.status === 'dark') || (!isDarkMode && item.status === 'light')
   );
 
-
   // Initialize search query from URL
   useEffect(() => {
     const query = searchParams.get('search');
@@ -93,7 +92,6 @@ export default function Navbar() {
       router.push(path);
       setDrawerVisible(false);
     }
-
   };
 
   const items = [
@@ -130,13 +128,6 @@ export default function Navbar() {
       onClick: () => handleNavigation('/about'),
       className: isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
     },
-    // {
-    //   key: 'help',
-    //   icon: <QuestionCircleOutlined />,
-    //   label: 'Help & Support',
-    //   onClick: () => handleNavigation('/help&support'),
-    //   className: isDarkMode ? 'hover:bg-gray-800' : 'hover:bg-gray-50'
-    // },
     {
       key: 'feedback',
       icon: <CommentOutlined />,
@@ -174,7 +165,7 @@ export default function Navbar() {
         localStorage.setItem('theme', 'light');
         localStorage.removeItem('isLoggedIn');
       },
-      style: { color: '#ff4d4f' }, // red color
+      style: { color: '#ff4d4f' },
       className: 'hover:!bg-gray-100 hover:!text-red-600',
     }
   ];
@@ -228,7 +219,7 @@ export default function Navbar() {
     }
   };
 
-  // Apply theme to search fields
+  // Responsive search bar styles
   const searchFieldStyles = {
     input: {
       backgroundColor: 'transparent',
@@ -244,7 +235,7 @@ export default function Navbar() {
     }
   };
 
-  // Apply theme to icon buttons
+  // Responsive icon button styles
   const iconButtonStyles = {
     display: 'flex',
     alignItems: 'center',
@@ -257,13 +248,13 @@ export default function Navbar() {
     backgroundColor: isDarkMode ? '#1f1f1f' : '#f9fafb'
   };
 
-  // Desktop search component with theme styling
+  // Desktop search component with responsive styling
   const renderDesktopSearch = () => (
     <div style={{
-      width: '35%',
-      paddingLeft: "100px",
+      width: screens.lg ? '35%' : '30%',
       minWidth: '200px',
-      marginLeft: '200px'
+      marginLeft: screens.lg ? '200px' : '50px',
+      paddingLeft: screens.xl ? '100px' : '0'
     }}>
       <Flex
         align="center"
@@ -325,7 +316,7 @@ export default function Navbar() {
     </div>
   );
 
-  // Mobile search component with theme styling
+  // Mobile search component with responsive styling
   const renderMobileSearch = () => (
     <div style={{
       flex: 1,
@@ -413,19 +404,19 @@ export default function Navbar() {
                 display: 'flex',
                 alignItems: 'center',
                 height: '100%',
-                lineHeight: 0 // This prevents extra space below the image
+                lineHeight: 0
               }}
             >
               <Image
                 src={filteredLogo?.logo ? `${baseURL}${filteredLogo.logo}` : "/images/logo.png"}
-                width={!screens.md ? 70 : 120}
-                height={!screens.md ? 30 : 50} // Set an appropriate height based on screen size
+                width={screens.xs ? 70 : screens.sm ? 90 : 120}
+                height={screens.xs ? 30 : screens.sm ? 40 : 50}
                 alt='logo'
                 style={{
                   objectFit: 'contain',
                   width: 'auto',
                   height: 'auto',
-                  maxHeight: '100%', // Ensures it doesn't exceed container height
+                  maxHeight: '100%',
                   filter: isDarkMode ? 'brightness(0.9) contrast(1.1)' : 'none'
                 }}
               />
@@ -438,7 +429,7 @@ export default function Navbar() {
 
         {/* Right Side Actions */}
         {!showMobileSearch && (
-          <Flex align="center" gap="middle" style={{ height: '100%' }}>
+          <Flex align="center" gap={screens.xs ? 'small' : 'middle'} style={{ height: '100%' }}>
             {screens.md ? (
               <>
                 <Button
@@ -449,13 +440,21 @@ export default function Navbar() {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    height: '40px'
+                    height: '40px',
+                    minWidth: screens.lg ? '100px' : '40px'
                   }}
                 >
                   {screens.lg ? 'New Post' : ''}
                 </Button>
 
-                <Badge style={{ backgroundColor: "#2930FF", marginTop: "5px", marginRight: "5px" }} count={chats?.unreadCount === 0 ? 0 : chats?.unreadCount}>
+                <Badge
+                  style={{
+                    backgroundColor: "#2930FF",
+                    marginTop: "5px",
+                    marginRight: "5px"
+                  }}
+                  count={chats?.unreadCount === 0 ? 0 : chats?.unreadCount}
+                >
                   <Button
                     onClick={() => handleNavigation("/chat")}
                     type="text"
@@ -464,7 +463,14 @@ export default function Navbar() {
                   />
                 </Badge>
 
-                <Badge style={{ backgroundColor: "#2930FF", marginTop: "5px", marginRight: "5px" }} count={notifications?.unreadCount || 0}>
+                <Badge
+                  style={{
+                    backgroundColor: "#2930FF",
+                    marginTop: "5px",
+                    marginRight: "5px"
+                  }}
+                  count={notifications?.unreadCount || 0}
+                >
                   <Button
                     onClick={() => handleNavigation("/notification")}
                     type="text"
@@ -489,50 +495,42 @@ export default function Navbar() {
               />
             )}
 
-            {
-
-              localStorage.getItem('isLoggedIn') === 'true' ? (
-                <Dropdown
-                  menu={{ items }}
-                  trigger={['click']}
-                  placement="bottomRight"
-                  arrow={{ pointAtCenter: true }}
-                >
-                  <div style={{ display: 'flex', alignItems: 'center', height: '100%', padding: '0 8px' }}>
-                    <Avatar
-                      src={getImageUrl(data?.data?.profile)}
-                      size={44}
-                      style={{
-                        cursor: 'pointer',
-                        border: isDarkMode ? '1px solid #333' : 'none'
-                      }}
-                    />
-                  </div>
-                </Dropdown>
-              ) : (
-                <Button type="primary" style={{ height: "38px", width: "100px" }} onClick={() => router.push('/auth/login')}>Sign In</Button>
-              )
-
-            }
-
-
-            {/* <Dropdown
-              menu={{ items }}
-              trigger={['click']}
-              placement="bottomRight"
-              arrow={{ pointAtCenter: true }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', height: '100%', padding: '0 8px' }}>
-                <Avatar
-                  src={getImageUrl(data?.data?.profile)}
-                  size={44}
-                  style={{
-                    cursor: 'pointer',
-                    border: isDarkMode ? '1px solid #333' : 'none'
-                  }}
-                />
-              </div>
-            </Dropdown> */}
+            {localStorage.getItem('isLoggedIn') === 'true' ? (
+              <Dropdown
+                menu={{ items }}
+                trigger={['click']}
+                placement="bottomRight"
+                arrow={{ pointAtCenter: true }}
+              >
+                <div style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: '100%',
+                  padding: screens.xs ? '0 4px' : '0 8px'
+                }}>
+                  <Avatar
+                    src={getImageUrl(data?.data?.profile)}
+                    size={screens.xs ? 36 : 44}
+                    style={{
+                      cursor: 'pointer',
+                      border: isDarkMode ? '1px solid #333' : 'none'
+                    }}
+                  />
+                </div>
+              </Dropdown>
+            ) : (
+              <Button
+                type="primary"
+                style={{
+                  height: "38px",
+                  width: screens.xs ? "80px" : "100px",
+                  fontSize: screens.xs ? "12px" : "14px"
+                }}
+                onClick={() => router.push('/auth/login')}
+              >
+                Sign In
+              </Button>
+            )}
           </Flex>
         )}
       </Header>
@@ -544,8 +542,13 @@ export default function Navbar() {
         closable={true}
         onClose={onClose}
         open={drawerVisible}
-        width={250}
+        width={screens.xs ? 250 : 300}
         className={`theme-transition ${isDarkMode ? 'dark-mode' : 'light-mode'}`}
+        styles={{
+          body: {
+            padding: 0
+          }
+        }}
       >
         <Menu
           mode="inline"

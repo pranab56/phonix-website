@@ -11,7 +11,6 @@ import toast from 'react-hot-toast';
 import { FiBookmark, FiFile, FiGrid, FiList, FiMessageSquare } from 'react-icons/fi';
 import { ThemeContext } from '../ClientLayout';
 
-
 const { useBreakpoint } = Grid;
 const { TextArea } = Input;
 
@@ -122,9 +121,7 @@ const ProfilePage = () => {
       });
       setIsEditModalOpen(true);
     }
-
   };
-
 
   const handleConfirmDelete = async () => {
     if (!postToDelete) return;
@@ -146,7 +143,6 @@ const ProfilePage = () => {
   const handleOptionSelect = (postId, option) => {
     if (option === 'edit') {
       handleEditPost(postId);
-
     } else if (option === 'delete') {
       setPostToDelete(postId);
       setIsDeleteModalOpen(true);
@@ -246,10 +242,10 @@ const ProfilePage = () => {
     >
       <ProfileBanner />
 
-      <main className="py-4 sm:py-6 lg:py-8 container mx-auto px-2 sm:px-4 lg:px-32">
+      <main className="py-4 sm:py-6 lg:py-8 px-2 sm:px-4 lg:px-4 container mx-auto max-w-screen-xl">
         <div className={`flex ${screens.md ? 'flex-row' : 'flex-col'} gap-4 sm:gap-6`}>
           {/* Sidebar - Activity Stats */}
-          <aside className={`${screens.md ? screens.lg ? 'w-1/4' : 'w-1/3' : 'w-full'}`}>
+          <aside className={`${screens.md ? (screens.lg ? 'w-1/4' : 'w-1/3') : 'w-full'} ${!screens.md ? 'mb-4' : ''}`}>
             <Card
               title="Your Activity"
               className={`shadow-sm hover:shadow transition-shadow ${isDarkMode ? 'dark-card' : 'light-card'}`}
@@ -257,13 +253,16 @@ const ProfilePage = () => {
                 backgroundColor: themeStyles.cardBackground,
                 borderColor: themeStyles.borderColor
               }}
+              bodyStyle={{
+                padding: screens.xs ? '12px' : '16px'
+              }}
             >
               <Space direction="vertical" size="middle" className="w-full">
                 {tabs.map(({ key, icon, label }) => (
                   <button
                     key={key}
                     onClick={() => setActiveTab(key)}
-                    className={`flex items-center justify-between w-full cursor-pointer p-3 rounded-md transition-all ${activeTab === key
+                    className={`flex items-center justify-between w-full cursor-pointer p-2 sm:p-3 rounded-md transition-all ${activeTab === key
                       ? 'font-medium' // Make active tab text bolder
                       : `hover:bg-[${themeStyles.hoverBg}] text-[${themeStyles.textColor}]`
                       }`}
@@ -277,9 +276,9 @@ const ProfilePage = () => {
                         : 'none'
                     }}
                   >
-                    <span className="flex items-center">
+                    <span className="flex items-center text-sm sm:text-base">
                       {React.cloneElement(icon, {
-                        className: `mr-3`,
+                        className: `mr-2 sm:mr-3`,
                         style: {
                           color: activeTab === key
                             ? themeStyles.activeTabText
@@ -288,7 +287,7 @@ const ProfilePage = () => {
                       })}
                       <span>{label}</span>
                     </span>
-                    <span className="font-bold" style={{
+                    <span className="font-bold text-sm sm:text-base" style={{
                       color: activeTab === key
                         ? themeStyles.activeTabText
                         : themeStyles.textColor
@@ -302,10 +301,10 @@ const ProfilePage = () => {
           </aside>
 
           {/* Posts Feed */}
-          <section className={`${screens.md ? screens.lg ? 'w-3/4' : 'w-2/3' : 'w-full'}`}>
+          <section className={`${screens.md ? (screens.lg ? 'w-3/4' : 'w-2/3') : 'w-full'}`}>
             {/* Header with Grid View Toggle */}
-            <div className="mb-6 flex items-center justify-between">
-              <h2 className="text-xl font-semibold" style={{ color: themeStyles.textColor }}>
+            <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+              <h2 className="text-lg sm:text-xl font-semibold" style={{ color: themeStyles.textColor }}>
                 {activeTab === 'totalPosts' && 'Your Posts'}
                 {activeTab === 'savedPosts' && 'Saved Posts'}
                 {activeTab === 'comments' && 'Your Comments'}
@@ -314,22 +313,24 @@ const ProfilePage = () => {
               {/* Grid View Toggle Button */}
               <Button
                 type="text"
-                icon={isGridView ? <FiList size={18} /> : <FiGrid size={18} />}
+                icon={isGridView ? <FiList size={screens.xs ? 16 : 18} /> : <FiGrid size={screens.xs ? 16 : 18} />}
                 onClick={toggleGridView}
-                className={`flex items-center justify-center gap-2 border px-3 py-2 rounded-md transition-all ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                className={`flex items-center justify-center gap-1 sm:gap-2 border px-2 sm:px-3 py-1 sm:py-2 rounded-md transition-all ${isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
                 style={{
                   backgroundColor: 'transparent',
                   color: themeStyles.textColor,
                   border: `1px solid gray`,
                 }}
               >
-                <span className='-mt-1.5 font-semibold'>{isGridView ? 'List View' : 'Grid View'}</span>
+                <span className={`${screens.xs ? 'text-sm' : 'text-base'} -mt-1 font-semibold`}>
+                  {isGridView ? 'List View' : 'Grid View'}
+                </span>
               </Button>
             </div>
 
             {isLoading ? (
               <div
-                className={`text-center p-8 rounded-lg shadow-sm ${isDarkMode ? 'dark-loading' : 'light-loading'}`}
+                className={`text-center p-6 sm:p-8 rounded-lg shadow-sm ${isDarkMode ? 'dark-loading' : 'light-loading'}`}
                 style={{
                   backgroundColor: themeStyles.cardBackground,
                   borderColor: themeStyles.borderColor
@@ -338,7 +339,7 @@ const ProfilePage = () => {
                 <p style={{ color: themeStyles.textColor }}>Loading...</p>
               </div>
             ) : postsToDisplay.length > 0 ? (
-              <div className={`${isGridView ? 'grid grid-cols-1 md:grid-cols-2 gap-4' : 'flex flex-col gap-4'}`}>
+              <div className={`${isGridView ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-3 sm:gap-4' : 'flex flex-col gap-3 sm:gap-4'}`}>
                 {postsToDisplay.map((post) => (
                   <ProfilePostCard
                     key={`${post.isSavedPost ? 'saved-' : ''}${post._id}`}
@@ -349,12 +350,13 @@ const ProfilePage = () => {
                     refetchPosts={refetchPosts}
                     myCommentPostRefetch={myCommentPostRefetch}
                     isDarkMode={isDarkMode}
+                    isGridView={isGridView}
                   />
                 ))}
               </div>
             ) : (
               <div
-                className={`text-center p-8 rounded-lg shadow-sm ${isDarkMode ? 'dark-empty' : 'light-empty'}`}
+                className={`text-center p-6 sm:p-8 rounded-lg shadow-sm ${isDarkMode ? 'dark-empty' : 'light-empty'}`}
                 style={{
                   backgroundColor: themeStyles.cardBackground,
                   borderColor: themeStyles.borderColor
@@ -370,85 +372,6 @@ const ProfilePage = () => {
           </section>
         </div>
       </main>
-
-      {/* Edit Post Modal */}
-      {/* <Modal
-        title="Edit Post"
-        open={isEditModalOpen}
-        onCancel={() => {
-          setIsEditModalOpen(false);
-          setEditingPost(null);
-          form.resetFields();
-        }}
-        footer={null}
-        destroyOnClose
-        className={`${isDarkMode ? 'dark-modal' : 'light-modal'}`}
-        styles={{
-          header: {
-            backgroundColor: themeStyles.cardBackground,
-            color: themeStyles.textColor,
-            borderBottomColor: themeStyles.borderColor
-          },
-          content: {
-            backgroundColor: themeStyles.cardBackground,
-            color: themeStyles.textColor
-          }
-        }}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleEditFormSubmit}
-        >
-          <Form.Item
-            name="title"
-            label="Post Title"
-            rules={[{ required: true, message: 'Please enter a title' }]}
-          >
-            <Input
-              placeholder="Enter post title"
-              className={`${isDarkMode ? 'dark-input' : 'light-input'}`}
-              style={{
-                backgroundColor: themeStyles.cardBackground,
-                color: themeStyles.textColor,
-                borderColor: themeStyles.borderColor
-              }}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="content"
-            label="Post Content"
-            rules={[{ required: true, message: 'Please enter some content' }]}
-          >
-            <TextArea
-              placeholder="Enter post content"
-              rows={6}
-              autoSize={{ minRows: 6, maxRows: 12 }}
-              className={`${isDarkMode ? 'dark-textarea' : 'light-textarea'}`}
-              style={{
-                backgroundColor: themeStyles.cardBackground,
-                color: themeStyles.textColor,
-                borderColor: themeStyles.borderColor
-              }}
-            />
-          </Form.Item>
-
-          <div className="flex justify-end gap-2 mt-4">
-            <Button
-              onClick={() => setIsEditModalOpen(false)}
-              style={{
-                backgroundColor: themeStyles.cardBackground,
-                color: themeStyles.textColor,
-                borderColor: themeStyles.borderColor
-              }}
-            >
-              Cancel
-            </Button>
-            <Button type="primary" htmlType="submit">Save Changes</Button>
-          </div>
-        </Form>
-      </Modal> */}
 
       {/* Delete Confirmation Modal */}
       <Modal

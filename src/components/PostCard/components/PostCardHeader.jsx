@@ -13,6 +13,7 @@ const PostCardHeader = ({
   handleMenuClick,
   isSaving
 }) => {
+
   const router = useRouter();
 
   const renderAuthorAvatar = () => (
@@ -68,8 +69,8 @@ const PostCardHeader = ({
         overlayClassName={isDarkMode ? 'dark-dropdown-overlay' : ''}
       >
         <button className={`font-bold p-2 rounded transition-colors ${isDarkMode
-            ? 'hover:bg-gray-700 text-gray-400 hover:text-gray-200'
-            : 'hover:bg-gray-100 text-gray-600 hover:text-gray-800'
+          ? 'hover:bg-gray-700 text-gray-400 hover:text-gray-200'
+          : 'hover:bg-gray-100 text-gray-600 hover:text-gray-800'
           } cursor-pointer`}>
           <AiOutlineEllipsis className={`${isMobile ? 'w-4 h-4' : 'w-5 h-5'}`} />
         </button>
