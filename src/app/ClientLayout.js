@@ -10,7 +10,6 @@ import { Provider } from "react-redux";
 import { store } from "../../utils/store";
 import "./globals.css";
 
-
 // Create Theme Context with more functionality
 export const ThemeContext = createContext({
   isDarkMode: false,
@@ -19,13 +18,11 @@ export const ThemeContext = createContext({
 });
 
 export default function ClientLayout({ children }) {
-
-
   const pathname = usePathname();
   const isAuthPage = pathname.startsWith('/auth');
 
-  // Theme state management
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  // Theme state management - Initialize with null to prevent hydration mismatch
+  const [isDarkMode, setIsDarkMode] = useState(null);
   const [mounted, setMounted] = useState(false);
 
   // Initialize theme on component mount
@@ -34,17 +31,18 @@ export default function ClientLayout({ children }) {
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
-      setIsDarkMode(savedTheme === 'dark');
-      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+      const darkMode = savedTheme === 'dark';
+      setIsDarkMode(darkMode);
+      document.documentElement.classList.toggle('dark', darkMode);
+      document.documentElement.style.colorScheme = darkMode ? 'dark' : 'light';
     } else {
       // Always default to light mode instead of checking system preference
       setIsDarkMode(false);
       document.documentElement.classList.toggle('dark', false);
+      document.documentElement.style.colorScheme = 'light';
       // Save light mode as the default preference
       localStorage.setItem('theme', 'light');
     }
-    // Apply color scheme to root
-    document.documentElement.style.colorScheme = isDarkMode ? 'dark' : 'light';
   }, []);
 
   // Handle theme toggle
@@ -86,11 +84,12 @@ export default function ClientLayout({ children }) {
     colorBgContainer: '#1a1a1a',
     colorBgLayout: '#000000',
     colorBgElevated: '#1f1f1f',
+    colorBorder: '#333333',
     borderRadius: 6,
   };
 
-  // Component-specific overrides with fixed hover states
-  const componentOverrides = {
+  // Component-specific overrides - moved inside component to access current isDarkMode
+  const getComponentOverrides = () => ({
     Layout: {
       headerBg: isDarkMode ? '#141414' : '#ffffff',
       bodyBg: isDarkMode ? '#1a1a1a' : '#ffffff',
@@ -99,7 +98,7 @@ export default function ClientLayout({ children }) {
     Menu: {
       itemBg: isDarkMode ? '#141414' : '#ffffff',
       itemSelectedBg: isDarkMode ? '#4E4EFB' : '#0001FB',
-      itemSelectedColor: isDarkMode ? '#ffffff' : '#ffffff',
+      itemSelectedColor: '#ffffff',
       itemHoverBg: isDarkMode ? '#2a2a2a' : '#f5f5f5',
       itemHoverColor: isDarkMode ? 'rgba(255, 255, 255, 0.85)' : 'rgba(0, 0, 0, 0.88)',
       itemActiveBg: isDarkMode ? '#2a2a2a' : '#f5f5f5',
@@ -129,12 +128,10 @@ export default function ClientLayout({ children }) {
     },
     Dropdown: {
       colorBgElevated: isDarkMode ? '#1f1f1f' : '#ffffff',
-      // colorBgTextHover: isDarkMode ? '#2a2a2a' : '#f5f5f5',
     },
     Popover: {
       colorBgElevated: isDarkMode ? '#1f1f1f' : '#ffffff',
     },
-
     Avatar: {
       colorBgContainer: isDarkMode ? '#2a2a2a' : '#f5f5f5',
     },
@@ -153,11 +150,12 @@ export default function ClientLayout({ children }) {
     Timeline: {
       itemColor: isDarkMode ? '#424242' : '#f0f0f0',
     },
-  };
+  });
 
   // Define CSS variables for custom components
   useEffect(() => {
-    if (!mounted) return;
+    if (!mounted || isDarkMode === null) return;
+
     const root = document.documentElement;
     if (isDarkMode) {
       root.style.setProperty('--background-color', '#1a1a1a');
@@ -176,7 +174,19 @@ export default function ClientLayout({ children }) {
     }
   }, [isDarkMode, mounted]);
 
-  // Always return HTML structure, even when not mounted
+  // Show loading state or return null until mounted to prevent hydration mismatch
+  if (!mounted || isDarkMode === null) {
+    return (
+      <html lang="en">
+        <body className="antialiased">
+          <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+            Loading...
+          </div>
+        </body>
+      </html>
+    );
+  }
+
   return (
     <html lang="en" className={isDarkMode ? 'dark' : ''}>
       <body
@@ -188,27 +198,23 @@ export default function ClientLayout({ children }) {
               theme={{
                 algorithm: isDarkMode ? theme.darkAlgorithm : theme.defaultAlgorithm,
                 token: isDarkMode ? darkThemeTokens : lightThemeTokens,
-                components: componentOverrides,
+                components: getComponentOverrides(),
               }}
             >
               <Provider store={store}>
-                {mounted && (
-                  <>
-                    {!isAuthPage && <Navbar />}
-                    <main className="theme-transition">
-                      {children}
-                    </main>
-                    <Toaster
-                      position="top-center"
-                      reverseOrder={false}
-                      toastOptions={{
-                        className: isDarkMode
-                          ? 'dark-toast bg-gray-800 text-white'
-                          : 'light-toast bg-white text-gray-900',
-                      }}
-                    />
-                  </>
-                )}
+                {!isAuthPage && <Navbar />}
+                <main className="theme-transition">
+                  {children}
+                </main>
+                <Toaster
+                  position="top-center"
+                  reverseOrder={false}
+                  toastOptions={{
+                    className: isDarkMode
+                      ? 'dark-toast bg-gray-800 text-white'
+                      : 'light-toast bg-white text-gray-900',
+                  }}
+                />
               </Provider>
             </ConfigProvider>
           </ThemeContext.Provider>

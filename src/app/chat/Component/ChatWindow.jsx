@@ -1,6 +1,5 @@
 'use client';
 import { useDeleteMessageMutation, useGetAllChatQuery, useGetAllMassageQuery, useMessageSendMutation, useReactMessageMutation } from '@/features/chat/massage';
-import { CaretRightOutlined } from '@ant-design/icons';
 import { Avatar, Badge, Button, Dropdown, Form, Input, Tooltip, Upload } from 'antd';
 import EmojiPicker from 'emoji-picker-react';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -10,8 +9,8 @@ import { IoMdSend } from 'react-icons/io';
 import { TbTrash } from 'react-icons/tb';
 import { useSelector } from 'react-redux';
 import { getImageUrl } from '../../../../utils/getImageUrl';
-import { ThemeContext } from '../../ClientLayout';
 import { ImageUplaod } from '../../../../utils/svgImage';
+import { ThemeContext } from '../../ClientLayout';
 
 const ChatWindow = ({ id }) => {
   // Use refetchOnMountOrArgChange to ensure data is fresh when component mounts
