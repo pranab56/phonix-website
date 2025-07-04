@@ -23,20 +23,23 @@ const ChatList = ({ setIsChatActive, status }) => {
   const [markAsRead, { isLoading: markAsReadLoading }] = useMarkAsReadMutation()
   const { data: chatListData, isLoading, isError, refetch } = useGetAllChatQuery(debouncedSearchTerm);
 
+
+  console.log(chatListData?.chats)
+
   const { chats } = useSelector((state) => state);
 
 
   // Memoize and sort the chat list to maintain consistent order
   const chatList = useMemo(() => {
-    if (!chatListData?.data) return [];
+    if (!chatListData?.chats) return [];
     // Sort by last message time (newest first) or any other criteria you prefer
-    return [...chatListData.data].sort((a, b) => {
+    return [...chatListData.chats].sort((a, b) => {
       return new Date(b.lastMessage?.createdAt || 0) - new Date(a.lastMessage?.createdAt || 0);
     });
-  }, [chatListData]);
+  }, [chatListData?.chats]);
 
 
-  console.log(chatList)
+  // console.log(chatList)
 
   const handleSelectChat = async (chatId) => {
     router.push(`/chat/${chatId}`);

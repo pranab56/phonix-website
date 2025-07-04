@@ -14,7 +14,6 @@ import {
   Typography,
   Upload
 } from 'antd';
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
@@ -22,10 +21,14 @@ import toast from 'react-hot-toast';
 import { baseURL } from '../../../utils/BaseURL';
 import { ThemeContext } from '../ClientLayout';
 
-const JoditEditor = dynamic(() => import('jodit-react'), {
-  ssr: false,
-  loading: () => <p>Loading editor...</p>
-});
+// Froala Editor imports
+import 'froala-editor/css/froala_editor.pkgd.min.css';
+import 'froala-editor/css/froala_style.min.css';
+// import 'froala-editor/css/plugins/emoticons.min.css';
+import 'froala-editor/js/froala_editor.pkgd.min.js';
+// import 'froala-editor/js/plugins/emoticons.min.js';
+import 'froala-editor/js/plugins/lists.min.js';
+import FroalaEditor from 'react-froala-wysiwyg';
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -69,141 +72,65 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
     }));
   }, [category, subcategoryData]);
 
-  const joditConfig = useMemo(() => ({
-    height: isMobile ? 300 : 400,
-    placeholder: "Write your post description here...",
-    theme: isDarkMode ? 'dark' : 'default',
-    buttons: ['bold', 'italic', 'underline', '|', 'ul', 'ol'],
-    buttonsMD: ['bold', 'italic', 'underline', '|', 'ul', 'ol'],
-    buttonsSM: ['bold', 'italic', 'underline', '|', 'ul', 'ol'],
-    buttonsXS: ['bold', 'italic', 'underline', '|', 'ul', 'ol'],
-    extraPlugins: ['list'],
-
-    // Paste configuration - THIS FIXES THE DIALOG ISSUE
-    askBeforePasteHTML: false,
-    askBeforePasteFromWord: false,
-    defaultActionOnPaste: 'insert_clear_html',
-    processPasteHTML: true,
-    processPasteFromWord: true,
-
-    // Additional paste settings
-    pasteHTMLActionList: [
-      { value: 'insert_as_html', text: 'Insert as HTML' },
-      { value: 'insert_as_text', text: 'Insert as Text' },
-      { value: 'insert_clear_html', text: 'Insert without formatting' }
+  // Froala Editor Configuration
+  const froalaConfig = useMemo(() => ({
+    placeholderText: 'Write your post description here...',
+    heightMin: isMobile ? 300 : 400,
+    toolbarButtons: [
+      ['bold', 'italic', 'underline', 'formatOL', 'formatUL', 'insertImage', 'emoticons']
     ],
-
-    // Paste filters
-    beautifyHTML: false,
-    cleanHTML: {
-      timeout: 300,
-      removeEmptyElements: true,
-      fillEmptyParagraph: false,
-      replaceNBSP: true,
-      replaceOldTags: {
-        'i': 'em',
-        'b': 'strong'
-      }
+    pluginsEnabled: ['lists', 'emoticons', 'image'],
+    quickInsertTags: [],
+    listAdvancedTypes: true,
+    listStyles: {
+      'fr-list-style-1': 'Circle',
+      'fr-list-style-2': 'Square',
+      'fr-list-style-3': 'Decimal',
+      'fr-list-style-4': 'Lower Alpha',
+      'fr-list-style-5': 'Upper Alpha',
+      'fr-list-style-6': 'Lower Roman',
+      'fr-list-style-7': 'Upper Roman'
     },
-
-    style: {
-      padding: "20px",
-      backgroundColor: isDarkMode ? '#1f2937' : '#fff',
-      color: isDarkMode ? '#e5e7eb' : '#374151',
-      'ol': {
-        listStyleType: 'decimal',
-        paddingLeft: '20px',
-      },
-      'ol[type="a"]': { listStyleType: 'lower-alpha' },
-      'ol[type="g"]': { listStyleType: 'lower-greek' },
-    },
-    toolbarAdaptive: false,
+    theme: isDarkMode ? 'dark' : 'default',
+    colorsBackground: isDarkMode ? ['#1f2937', '#111827', '#374151'] : ['#FFFFFF', '#F5F5F5', '#DDDDDD'],
+    colorsText: isDarkMode ? ['#E5E7EB', '#D1D5DB', '#9CA3AF'] : ['#000000', '#333333', '#666666'],
     toolbarSticky: true,
-    showCharsCounter: true,
-    showWordsCounter: true,
-
-    // Events to handle paste behavior
+    toolbarStickyOffset: 0,
+    toolbarVisibleWithoutSelection: true,
+    charCounterCount: true,
+    wordCounterCount: true,
+    pastePlain: true,
+    pasteDeniedTags: ['script', 'iframe', 'style'],
+    pasteDeniedAttrs: ['style', 'class'],
+    pasteAllowedStyleProps: [],
+    pasteKeepFormatting: false,
+    pasteConvertWordHeadingToParagraph: true,
+    pasteRemoveStyles: true,
+    pasteRemoveEmptyTags: true,
+    imageUploadURL: `${baseURL}/upload`,
+    imageUploadMethod: 'POST',
+    imageMaxSize: 5 * 1024 * 1024,
+    imageAllowedTypes: ['jpeg', 'jpg', 'png', 'gif'],
     events: {
-      beforePaste: function (event) {
-        // Optional: You can add custom logic here
-        return true;
+      'contentChanged': function () {
+        const content = this.html.get();
+        setDescription(content);
+        if (formErrors.description) {
+          setFormErrors({ ...formErrors, description: null });
+        }
       },
-      afterPaste: function (event) {
-        // Clean up any unwanted formatting after paste
-        const editor = this;
-        setTimeout(() => {
-          // Ensure ordered lists maintain decimal numbering
-          const orderedLists = editor.editor.querySelectorAll('ol');
-          orderedLists.forEach(ol => {
-            if (!ol.hasAttribute('type')) {
-              ol.style.listStyleType = 'decimal';
-            }
-          });
-        }, 100);
+      'initialized': function () {
+        if (isDarkMode) {
+          this.$el.closest('.fr-box').classList.add('fr-dark');
+        }
+        // Set the initial content when editor is initialized
+        if (description) {
+          this.html.set(description);
+        }
       }
     }
-  }), [isMobile, isDarkMode]);
+  }), [isMobile, isDarkMode, description, formErrors.description]);
 
-  useEffect(() => {
-    if (isDarkMode) {
-      const style = document.createElement('style');
-      style.id = 'jodit-dark-mode-styles';
-      style.innerHTML = `
-            .jodit-container.jodit-dark-theme,
-            .jodit-container.jodit-dark-theme .jodit-workplace,
-            .jodit-container.jodit-dark-theme .jodit-wysiwyg {
-                background-color: #1f2937 !important;
-                color: #e5e7eb !important;
-            }
-            .jodit-dark-theme .jodit-toolbar__box {
-                background-color: #374151 !important;
-                border-color: #4b5563 !important;
-            }
-            .jodit-dark-theme .jodit-toolbar {
-                background-color: #374151 !important;
-                border-color: #4b5563 !important;
-            }
-            .jodit-dark-theme .jodit-wysiwyg {
-                color: #e5e7eb !important;
-            }
-            .dark-editor .jodit-container {
-                border-color: #4b5563 !important;
-            }
-            /* Toolbar styling */
-            .jodit-toolbar__box {
-                flex-wrap: nowrap !important;
-                overflow-x: auto !important;
-            }
-            .jodit-toolbar-button {
-                flex-shrink: 0 !important;
-            }
-            /* Force ol with decimal numbers */
-            .jodit-wysiwyg ol {
-                list-style-type: decimal !important;
-                padding-left: 20px !important;
-            }
-            
-            /* Hide paste dialog if it still appears */
-            .jodit-dialog[data-editor-id] .jodit-dialog__panel .jodit-dialog__content {
-                display: none !important;
-            }
-            
-            /* Additional paste-related styling */
-            .jodit-paste-storage {
-                display: none !important;
-            }
-        `;
-      document.head.appendChild(style);
-      return () => {
-        const existingStyle = document.getElementById('jodit-dark-mode-styles');
-        if (existingStyle) {
-          document.head.removeChild(existingStyle);
-        }
-      };
-    }
-  }, [isDarkMode]);
-
-  // Load draft data when component mounts
   useEffect(() => {
     if (!isEditing && !initialValues) {
       const savedDraft = localStorage.getItem('blogPostDraft');
@@ -231,7 +158,6 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
       }
     }
   }, [isEditing, initialValues]);
-
 
   // Initialize form with initial values when editing
   useEffect(() => {
@@ -304,9 +230,7 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
   };
 
   const handleFileChange = ({ fileList: newFileList }) => {
-    // Filter out any files with errors and limit to 3 files
     const validFiles = newFileList.filter(file => {
-      // Keep existing files and new files that are not in error state
       return file.status !== 'error';
     }).slice(0, 3);
 
@@ -314,20 +238,17 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
   };
 
   const beforeUpload = (file) => {
-    // Check if it's an image
     const isImage = file.type.startsWith('image/');
     if (!isImage) {
       toast.error('Only image files can be uploaded!');
-      return Upload.LIST_IGNORE; // This prevents the file from being added to the list
+      return Upload.LIST_IGNORE;
     }
 
-    // Show message for large files but don't block them
     const fileSizeInMB = file.size / 1024 / 1024;
     if (fileSizeInMB > 500) {
       toast.success(`Uploading large files (${fileSizeInMB.toFixed(2)} MB). Please wait...`);
     }
 
-    // Return false to prevent automatic upload but allow file to be added to list
     return false;
   };
 
@@ -428,14 +349,12 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
       const response = isEditing && postId
         ? await editPost({ id: postId, body: formData }).unwrap()
         : await createPost(formData).unwrap();
-      console.log(response);
 
       if (isEditing && response.success) {
         refetchPosts();
         myCommentPostRefetch()
       }
       toast.success(isEditing ? 'Post updated successfully' : 'Post created successfully');
-
 
       if (!isEditing) {
         router.push('/');
@@ -479,7 +398,7 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
               />
             </div>
           )}
-          <div className={`${!isEditing && 'py-4 sm:p-6'} ${isDarkMode ? 'dark-editor' : ''}`}>
+          <div className={`${!isEditing && 'py-4 sm:p-6'}`}>
             {/* Title Input */}
             <div className="mb-6 sm:mb-8">
               <Title level={5} className={`mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
@@ -552,21 +471,16 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
               <Title level={5} className={`mb-2 ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}>
                 Description <span className="text-red-500">*</span>
               </Title>
-              <Card
-                className={`border rounded-lg overflow-hidden hover:border-blue-300 transition-all p-0 ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} ${formErrors.description ? 'border-red-500' : ''}`}
-                bodyStyle={{ padding: 0 }}
+              <div
+                className={` rounded-lg overflow-hidden transition-all p-0 ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} ${formErrors.description ? 'border-red-500' : ''}`}
               >
-                <div className={`${isDarkMode ? 'jodit-dark-theme' : ''}`}>
-                  <JoditEditor
-                    ref={editorRef}
-                    value={description}
-                    config={joditConfig}
-                    tabIndex={1}
-                    onBlur={handleDescriptionChange}
-                    className={isDarkMode ? 'jodit-dark-mode' : ''}
-                  />
-                </div>
-              </Card>
+                <FroalaEditor
+                  tag='textarea'
+                  config={froalaConfig}
+                  // model={description}
+                  onModelChange={handleDescriptionChange}
+                />
+              </div>
               {formErrors.description && (
                 <div className="text-red-500 mt-1 text-sm">{formErrors.description}</div>
               )}

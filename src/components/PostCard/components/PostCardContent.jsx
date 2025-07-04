@@ -29,8 +29,8 @@ const PostCardContent = ({
           {postData.content.replace(/<[^>]+>/g, '').split(' ').slice(0, 20).join(' ')}...
           <button
             className={`${isDarkMode
-                ? 'text-blue-400 hover:text-blue-300'
-                : 'text-blue-600 hover:text-blue-800'
+              ? 'text-blue-400 hover:text-blue-300'
+              : 'text-blue-600 hover:text-blue-800'
               } cursor-pointer font-medium ml-1`}
             onClick={handleCommentClick}
           >
