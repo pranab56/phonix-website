@@ -100,3 +100,53 @@
 .ant-upload-list-item-actions .anticon-eye {
   display: none !important;
 }
+
+
+
+
+/* Froala Dark Mode Full Overrides */
+.fr-box.fr-dark .fr-wrapper {
+  background-color: #1f2937 !important;
+}
+
+.fr-box.fr-dark .fr-element {
+  color: #e5e7eb !important;
+  background-color: #1f2937 !important;
+}
+
+.fr-box.fr-dark .fr-element p,
+.fr-box.fr-dark .fr-element h1,
+.fr-box.fr-dark .fr-element h2,
+.fr-box.fr-dark .fr-element h3,
+.fr-box.fr-dark .fr-element h4,
+.fr-box.fr-dark .fr-element h5,
+.fr-box.fr-dark .fr-element h6,
+.fr-box.fr-dark .fr-element li,
+.fr-box.fr-dark .fr-element a {
+  color: #e5e7eb !important;
+}
+
+.fr-box.fr-dark .fr-placeholder {
+  color: #9ca3af !important;
+}
+
+.fr-box.fr-dark .fr-toolbar {
+  background-color: #111827 !important;
+  border-color: #374151 !important;
+}
+
+.fr-box.fr-dark .fr-second-toolbar {
+  background-color: #111827 !important;
+  border-color: #374151 !important;
+}
+
+.fr-box.fr-dark .fr-modal .fr-modal-wrapper .fr-modal-body {
+  background-color: #1f2937 !important;
+  color: #e5e7eb !important;
+}
+
+.fr-box.fr-dark .fr-modal .fr-modal-wrapper .fr-modal-header {
+  background-color: #111827 !important;
+  border-color: #374151 !important;
+  color: #e5e7eb !important;
+}

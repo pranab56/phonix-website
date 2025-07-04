@@ -24,9 +24,8 @@ import { ThemeContext } from '../ClientLayout';
 // Froala Editor imports
 import 'froala-editor/css/froala_editor.pkgd.min.css';
 import 'froala-editor/css/froala_style.min.css';
-// import 'froala-editor/css/plugins/emoticons.min.css';
+import 'froala-editor/css/themes/dark.min.css';
 import 'froala-editor/js/froala_editor.pkgd.min.js';
-// import 'froala-editor/js/plugins/emoticons.min.js';
 import 'froala-editor/js/plugins/lists.min.js';
 import FroalaEditor from 'react-froala-wysiwyg';
 
@@ -120,9 +119,6 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
         }
       },
       'initialized': function () {
-        if (isDarkMode) {
-          this.$el.closest('.fr-box').classList.add('fr-dark');
-        }
         // Set the initial content when editor is initialized
         if (description) {
           this.html.set(description);
@@ -130,6 +126,19 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
       }
     }
   }), [isMobile, isDarkMode, description, formErrors.description]);
+
+  // Update editor theme when dark mode changes
+  useEffect(() => {
+    if (editorRef.current) {
+      const editor = editorRef.current.editor;
+      if (editor) {
+        editor.opts.theme = isDarkMode ? 'dark' : 'default';
+        // Force a refresh of the editor to apply theme changes
+        editor.destroy();
+        editor.initialize();
+      }
+    }
+  }, [isDarkMode]);
 
   useEffect(() => {
     if (!isEditing && !initialValues) {
@@ -472,12 +481,12 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
                 Description <span className="text-red-500">*</span>
               </Title>
               <div
-                className={` rounded-lg overflow-hidden transition-all p-0 ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} ${formErrors.description ? 'border-red-500' : ''}`}
+                className={`rounded-lg overflow-hidden transition-all ${isDarkMode ? 'border-gray-600' : 'border-gray-300'} ${formErrors.description ? 'border-red-500' : ''}`}
               >
                 <FroalaEditor
                   tag='textarea'
                   config={froalaConfig}
-                  // model={description}
+                  ref={editorRef}
                   onModelChange={handleDescriptionChange}
                 />
               </div>
