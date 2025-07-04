@@ -286,7 +286,7 @@ const ChatWindow = ({ id }) => {
           }
         `}</style>
 
-        {messages.map((message, index) => {
+        {messages?.messages?.map((message, index) => {
           const isCurrentUser = message.sender?._id === loginUserId;
           const isDeleted = message.isDeleted === true;
 
