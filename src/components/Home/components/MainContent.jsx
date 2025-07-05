@@ -1,8 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
+"use client";
+
+import { FileText } from 'lucide-react';
+import { useContext, useEffect, useRef, useState } from 'react';
+import { ThemeContext } from '../../../app/ClientLayout';
 import Loading from '../../Loading/Loading';
 import PaginationControls from './PaginationControls';
 import PostsGrid from './PostsGrid';
-import { FileText } from 'lucide-react';
 
 const MainContent = ({
   posts,
@@ -18,6 +21,7 @@ const MainContent = ({
   const [displayPosts, setDisplayPosts] = useState([]);
   const [masonryColumns, setMasonryColumns] = useState([]);
   const prevPostsRef = useRef([]);
+  const { isDarkMode } = useContext(ThemeContext);
 
   // Function to distribute posts into columns for masonry layout
   const distributePostsIntoColumns = (postsArray) => {
@@ -120,7 +124,7 @@ const MainContent = ({
   // Show loading if data is still being fetched from API
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-[400px]">
+      <div className={`flex justify-center items-center h-[400px] ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <Loading />
       </div>
     );
@@ -129,7 +133,7 @@ const MainContent = ({
   // Show loading during our reduced delay (only when there is data)
   if (isContentLoading) {
     return (
-      <div className="flex justify-center items-center h-[400px]">
+      <div className={`flex justify-center items-center h-[400px] ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
         <Loading />
       </div>
     );
@@ -138,27 +142,34 @@ const MainContent = ({
   // Show no posts message immediately when there's no data
   if (!displayPosts.length) {
     return (
-      <div className="max-w-md mx-auto sm:mt-20 mt-10 text-center">
-      {/* Icon Container */}
-      <div className="relative mb-3">
-        <div className="w-20 h-20 mx-auto bg-white rounded-full shadow-lg flex items-center justify-center relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-100 to-purple-100 opacity-50"></div>
-          <FileText className="w-10 h-10 text-slate-400 relative z-10" strokeWidth={1.5} />
+      <div className={`max-w-md mx-auto sm:mt-20 mt-10 text-center ${isDarkMode ? 'text-gray-100' : 'text-gray-900'}`}>
+        {/* Icon Container */}
+        <div className="relative mb-3">
+          <div className={`w-20 h-20 mx-auto rounded-full shadow-lg flex items-center justify-center relative overflow-hidden ${isDarkMode ? 'bg-gray-800' : 'bg-white'
+            }`}>
+            <div className={`absolute inset-0 bg-gradient-to-br opacity-50 ${isDarkMode ? 'from-blue-900 to-purple-900' : 'from-blue-100 to-purple-100'
+              }`}></div>
+            <FileText className={`w-10 h-10 relative z-10 ${isDarkMode ? 'text-gray-400' : 'text-slate-400'
+              }`} strokeWidth={1.5} />
+          </div>
+          {/* Floating Elements */}
+          <div className={`absolute top-4 right-8 w-6 h-6 rounded-full opacity-60 animate-pulse ${isDarkMode ? 'bg-blue-800' : 'bg-blue-200'
+            }`}></div>
+          <div className={`absolute bottom-8 left-4 w-4 h-4 rounded-full opacity-40 animate-pulse delay-500 ${isDarkMode ? 'bg-purple-800' : 'bg-purple-200'
+            }`}></div>
         </div>
-        {/* Floating Elements */}
-        <div className="absolute top-4 right-8 w-6 h-6 bg-blue-200 rounded-full opacity-60 animate-pulse"></div>
-        <div className="absolute bottom-8 left-4 w-4 h-4 bg-purple-200 rounded-full opacity-40 animate-pulse delay-500"></div>
-      </div>
 
-      {/* Main Content */}
-      <div className="space-y-4 mb-8">
-        <h2 className="text-2xl font-bold text-slate-800 tracking-tight">
-          No Posts Found
-        </h2>
-        <p className="text-slate-600 text-md leading-relaxed">
-          It looks like there aren't any posts here yet. Be the first to share something amazing!
-        </p>
-      </div>
+        {/* Main Content */}
+        <div className="space-y-4 mb-8">
+          <h2 className={`text-2xl font-bold tracking-tight ${isDarkMode ? 'text-gray-100' : 'text-slate-800'
+            }`}>
+            No Posts Found
+          </h2>
+          <p className={`text-md leading-relaxed ${isDarkMode ? 'text-gray-400' : 'text-slate-600'
+            }`}>
+            It looks like there aren't any posts here yet. Be the first to share something amazing!
+          </p>
+        </div>
       </div>
     );
   }
