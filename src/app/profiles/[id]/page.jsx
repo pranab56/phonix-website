@@ -2,9 +2,9 @@
 import AuthorPostCard from '@/components/AuthorPostCard';
 import { useCreateChatMutation } from '@/features/chat/massage';
 import { useGetByUserIdQuery, useGetProfileByIdQuery, useLikePostMutation } from '@/features/post/postApi';
-import { Grid } from 'antd';
+import { Button, Grid } from 'antd';
 import { useParams, useRouter } from 'next/navigation';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import toast from 'react-hot-toast';
 import { isAuthenticated } from '../../../../utils/auth';
 import { getImageUrl } from '../../../../utils/getImageUrl';
@@ -22,6 +22,7 @@ const ProfileBanner = () => {
   const { data, isLoading: getbuyUserLoading, refetch } = useGetByUserIdQuery(id);
   const { data: profile, isLoading: profileLoading } = useGetProfileByIdQuery(id);
   const { isDarkMode } = useContext(ThemeContext);
+  const [loading, setLoading] = useState(false);
 
   const handleLike = async (postId) => {
     try {
@@ -33,6 +34,7 @@ const ProfileBanner = () => {
   };
 
   const handleChat = async (id) => {
+    setLoading(true)
     if (!isAuthenticated()) {
       router.push('/auth/login');
       return;
@@ -41,6 +43,7 @@ const ProfileBanner = () => {
         const response = await createChat({ participant: id }).unwrap();
         if (response.success) {
           router.push(`/chat/${response?.data?._id}`)
+          setLoading(true)
         }
       } catch (error) {
         console.log(error)
@@ -84,7 +87,8 @@ const ProfileBanner = () => {
 
               {/* Message Button - Right Aligned */}
               <div className="flex-1"></div>
-              <button
+              <Button
+                loading={loading}
                 onClick={() => handleChat(id)}
                 className={`
                   ${isMobile ? 'px-3 py-1.5 text-sm' : 'px-4 py-2 text-base'} 
@@ -94,6 +98,7 @@ const ProfileBanner = () => {
                   focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 
                   ${isDarkMode ? 'focus:ring-offset-gray-700' : 'focus:ring-offset-white'}
                 `}
+                style={{ padding: "20px" }}
                 aria-label="Send message"
                 disabled={!profile?.data}
               >
@@ -111,7 +116,7 @@ const ProfileBanner = () => {
                   <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
                 </svg>
                 <span>Send Message</span>
-              </button>
+              </Button>
             </div>
 
             {/* Profile Info */}

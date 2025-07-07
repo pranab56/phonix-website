@@ -54,12 +54,12 @@ export const commentApi = baseApi.injectEndpoints({
       query: (data) => ({
         url: `/messages/react/${data.messageId}`,
         method: "POST",
-        body: {reactionType : data.reaction},
+        body: { reactionType: data.reaction },
       }),
       invalidatesTags: ["chat"],
     }),
 
-    
+
     DeleteMessage: builder.mutation({
       query: (id) => ({
         url: `/messages/delete/${id}`,
@@ -68,7 +68,7 @@ export const commentApi = baseApi.injectEndpoints({
       invalidatesTags: ["chat"],
     }),
 
-    
+
 
 
 

@@ -30,7 +30,7 @@ export const formatTime = (timestamp) => (
 export const formatPostData = (post, currentUserId) => ({
   id: post._id,
   author: {
-    id: post.author._id,
+    id: post?.author?._id,
     username: post?.author?.userName || "Anonymous",
     avatar: post?.author?.profile,
     name: post?.author?.name || "User"
