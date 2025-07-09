@@ -1,6 +1,6 @@
 'use client';
 
-import { addChat, markChatAsRead, updateLastMessage } from '@/redux/features/chatSlice';
+import { addChats, markChatAsRead, updateLastMessage } from '@/redux/features/chatSlice';
 import { addMessage } from '@/redux/features/messageSlice';
 import { addNotification } from '@/redux/features/notificationSlice';
 import { useEffect } from 'react';
@@ -25,7 +25,21 @@ const SocketComponent = () => {
     });
 
     socket.on(`newChat::${loggedInUserId}`, (chat) => {
-      dispatch(addChat(chat));
+      dispatch(addChats(chat));
+    });
+
+
+    // In your SocketComponent.js
+    socket.on(`chatDeleted::${loggedInUserId}`, (chatId) => {
+      dispatch(deleteChatLocally(chatId));
+    });
+
+    socket.on(`chatMuted::${loggedInUserId}`, ({ chatId, isMuted }) => {
+      dispatch(toggleMuteChat(chatId));
+    });
+
+    socket.on(`chatBlocked::${loggedInUserId}`, ({ chatId, isBlocked }) => {
+      dispatch(toggleBlockChat(chatId));
     });
 
     socket.on(`chatMarkedAsRead::${loggedInUserId}`, (chatId) => {
