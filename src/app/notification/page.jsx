@@ -3,18 +3,18 @@ import { useDeleteAllMutation, useDeleteSingleMutation, useGetAllNotificationQue
 import {
   BellOutlined,
   DeleteOutlined,
-  InfoCircleOutlined,
   LoadingOutlined,
-  MessageOutlined,
   MoreOutlined
 } from '@ant-design/icons';
-import { Avatar, Badge, Button, Dropdown, Layout, List, Menu, Pagination, Spin } from 'antd';
+
+import { Avatar, Badge, Button, Dropdown, Layout, List, Menu, Pagination } from 'antd';
 import { useRouter } from 'next/navigation';
 import { useContext, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-import { ThemeContext } from '../ClientLayout';
+import { CommentIcon, ErrorIcon, FollowIcon, InfoIcon, LikeIcon, PostIcon, ReplyIcon, SuccessIcon } from '../../../public/images/Notification';
 import Loading from '../../components/Loading/Loading';
+import { ThemeContext } from '../ClientLayout';
 const { Content } = Layout;
 // Custom loading icon
 const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
@@ -30,6 +30,8 @@ export default function NotificationPage() {
     refetchOnMountOrArgChange: true
   });
   const { notifications } = useSelector((state) => state);
+
+  console.log(notifications)
 
   // Total pages from meta data
   const total = notifications?.meta?.total || 0;
@@ -71,18 +73,22 @@ export default function NotificationPage() {
   };
   const getNotificationIcon = (type) => {
     switch (type) {
-      case 'message':
-        return <MessageOutlined className={isDarkMode ? "text-blue-400" : "text-blue-500"} />;
-      case 'system':
-        return <BellOutlined className={isDarkMode ? "text-green-400" : "text-green-500"} />;
-      case 'alert':
-        return <BellOutlined className={isDarkMode ? "text-red-400" : "text-red-500"} />;
-      case 'info':
-        return <InfoCircleOutlined className={isDarkMode ? "text-blue-400" : "text-blue-500"} />;
       case 'comment':
-        return <MessageOutlined className={isDarkMode ? "text-purple-400" : "text-purple-500"} />;
+        return <CommentIcon />;
+      case 'like':
+        return <LikeIcon />;
+      case 'follow':
+        return <FollowIcon />;
+      case 'error':
+        return <ErrorIcon />;
+      case 'success':
+        return <SuccessIcon />;
+      case 'info':
+        return <InfoIcon />;
       case 'post':
-        return <BellOutlined className={isDarkMode ? "text-blue-400" : "text-blue-500"} />;
+        return <PostIcon />;
+      case 'reply':
+        return <ReplyIcon />;
       default:
         return <BellOutlined />;
     }
@@ -101,9 +107,6 @@ export default function NotificationPage() {
         toast.error("Failed to mark notification as read");
       }
     }
-
-
-
 
   };
   const formatNotificationTime = (dateString) => {
@@ -201,7 +204,6 @@ export default function NotificationPage() {
               <div className="p-8 text-center">
                 {/* <Spin indicator={antIcon} />
                 <p className={`mt-2 ${textMutedClass}`}>Loading notifications...</p> */}
-
                 <Loading />
               </div>
             )}
@@ -225,7 +227,7 @@ export default function NotificationPage() {
                         overlay={menu(item.id, item.read)}
                         trigger={['click']}
                         placement="bottomRight"
-                        onClick={(e) => e.stopPropagation()} // Prevent triggering item click
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <Button
                           type="text"
@@ -233,7 +235,7 @@ export default function NotificationPage() {
                           size="small"
                           className={`opacity-70 hover:opacity-100 ${isDarkMode ? "text-gray-300" : ""}`}
                           disabled={processingNotificationId === item.id}
-                          onClick={(e) => e.stopPropagation()} // Prevent triggering item click
+                          onClick={(e) => e.stopPropagation()}
                         />
                       </Dropdown>
                     ]}
@@ -246,6 +248,7 @@ export default function NotificationPage() {
                           icon={getNotificationIcon(item.type)}
                           size="default"
                           className="flex items-center justify-center"
+                          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                         />
                       }
                       title={

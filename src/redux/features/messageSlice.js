@@ -1,7 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { messageApi } from '../../features/chat/message/messageApi';
 
-
 const initialState = {
   messages: [],
   pinnedMessages: [],
@@ -17,9 +16,8 @@ const messageSlice = createSlice({
   initialState,
   reducers: {
     addMessage: (state, action) => {
-      // Prevent duplicates
       if (!state.messages.some(msg => msg._id === action.payload._id)) {
-        state.messages.unshift(action.payload);
+        state.messages.push(action.payload); // Changed from unshift to push
       }
     },
     resetMessages: (state) => {
@@ -30,6 +28,75 @@ const messageSlice = createSlice({
     },
     setPage: (state, action) => {
       state.page = action.payload;
+    },
+    updateMessageReaction: (state, action) => {
+      const { messageId, reaction, userId } = action.payload;
+      state.messages = state.messages.map(msg => {
+        if (msg._id === messageId) {
+          const existingIndex = msg.reactions?.findIndex(r => r.userId._id === userId) ?? -1;
+          if (existingIndex >= 0) {
+            const updatedReactions = [...msg.reactions];
+            updatedReactions[existingIndex] = {
+              ...updatedReactions[existingIndex],
+              reactionType: reaction,
+              timestamp: new Date().toISOString()
+            };
+            return { ...msg, reactions: updatedReactions };
+          } else {
+            return {
+              ...msg,
+              reactions: [
+                ...(msg.reactions || []),
+                {
+                  userId: { _id: userId },
+                  reactionType: reaction,
+                  timestamp: new Date().toISOString(),
+                  _id: `temp-${Date.now()}`
+                }
+              ]
+            };
+          }
+        }
+        return msg;
+      });
+    },
+    updateMessagePin: (state, action) => {
+      const { messageId, isPinned, pinnedBy } = action.payload;
+      state.messages = state.messages.map(msg => {
+        if (msg._id === messageId) {
+          return {
+            ...msg,
+            isPinned,
+            pinnedAt: isPinned ? new Date().toISOString() : undefined,
+            pinnedBy: isPinned ? pinnedBy : undefined
+          };
+        }
+        return msg;
+      });
+
+      if (isPinned) {
+        const message = state.messages.find(msg => msg._id === messageId);
+        if (message) {
+          state.pinnedMessages = [message, ...state.pinnedMessages.filter(msg => msg._id !== messageId)];
+        }
+      } else {
+        state.pinnedMessages = state.pinnedMessages.filter(msg => msg._id !== messageId);
+      }
+    },
+    updateMessageDelete: (state, action) => {
+      const { messageId } = action.payload;
+      state.messages = state.messages.map(msg => {
+        if (msg._id === messageId) {
+          return {
+            ...msg,
+            text: "This message has been deleted.",
+            isDeleted: true,
+            images: []
+          };
+        }
+        return msg;
+      });
+      state.pinnedMessages = state.pinnedMessages.filter(msg => msg._id !== messageId);
     }
   },
   extraReducers: (builder) => {
@@ -40,18 +107,16 @@ const messageSlice = createSlice({
       .addMatcher(messageApi.endpoints.getAllMassage.matchFulfilled, (state, { payload }) => {
         state.isLoading = false;
         if (payload.data) {
-          // For initial load or new chat
           if (state.page === 1) {
             state.messages = payload.data.messages || [];
             state.pinnedMessages = payload.data.pinnedMessages || [];
           } else {
-            // For pagination - append new messages
             const newMessages = payload.data.messages || [];
             const existingIds = new Set(state.messages.map(msg => msg._id));
             const uniqueNewMessages = newMessages.filter(msg => !existingIds.has(msg._id));
-            state.messages = [...state.messages, ...uniqueNewMessages];
+            state.messages = [...uniqueNewMessages, ...state.messages]; // Changed order for pagination
           }
-          state.hasMore = payload.data.messages?.length === state.limit;
+          state.hasMore = (payload.data.messages?.length || 0) >= state.limit;
         }
       })
       .addMatcher(messageApi.endpoints.getAllMassage.matchRejected, (state, { error }) => {
@@ -61,5 +126,13 @@ const messageSlice = createSlice({
   }
 });
 
-export const { addMessage, resetMessages, setPage } = messageSlice.actions;
+export const {
+  addMessage,
+  resetMessages,
+  setPage,
+  updateMessageReaction,
+  updateMessagePin,
+  updateMessageDelete
+} = messageSlice.actions;
+
 export default messageSlice.reducer;
