@@ -23,7 +23,7 @@ export const messageApi = baseApi.injectEndpoints({
         url: `/messages/react/${messageId}`,
         method: "POST",
         body: {
-          reactionType: reaction,
+          reactionType: reaction, //  {"reactionType": "like" } //'like' | 'love' | 'thumbs_up' | 'laugh' | 'angry' | 'sad'
         },
       }),
       invalidatesTags: (result, error, { messageId }) => [
@@ -45,7 +45,7 @@ export const messageApi = baseApi.injectEndpoints({
       query: ({ messageId, action }) => ({
         url: `/messages/pin-unpin/${messageId}`,
         method: "PATCH",
-        body: { action }
+        body: { action }  // { "action": "pin"}  // unpin 
       }),
       invalidatesTags: (result, error, { messageId }) => [
         { type: 'Message', id: messageId },

@@ -124,7 +124,9 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
           this.html.set(description);
         }
       }
-    }
+    },
+    // Add this line to remove Froala branding (Powered by Froala)
+    license: false, // Disables the Froala branding
   }), [isMobile, isDarkMode, description, formErrors.description]);
 
   // Update editor theme when dark mode changes
@@ -354,6 +356,8 @@ const BlogPostForm = ({ initialValues, isEditing = false, onSuccess, postId, ref
           }
         });
       }
+
+      console.log(description) //
 
       const response = isEditing && postId
         ? await editPost({ id: postId, body: formData }).unwrap()

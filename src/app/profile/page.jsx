@@ -339,19 +339,27 @@ const ProfilePage = () => {
                 <p style={{ color: themeStyles.textColor }}>Loading...</p>
               </div>
             ) : postsToDisplay.length > 0 ? (
-              <div className={`${isGridView ? 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-3 sm:gap-4' : 'flex flex-col gap-3 sm:gap-4'}`}>
+              <div className={`${
+                isGridView 
+                  ? 'columns-1 sm:columns-2 lg:columns-2 xl:columns-2 gap-3 sm:gap-4 space-y-3 sm:space-y-4' 
+                  : 'flex flex-col gap-3 sm:gap-4'
+              }`}>
                 {postsToDisplay.map((post) => (
-                  <ProfilePostCard
+                  <div
                     key={`${post.isSavedPost ? 'saved-' : ''}${post._id}`}
-                    postData={post}
-                    onLike={handleLike}
-                    onOptionSelect={handleOptionSelect}
-                    onUnsave={handleUnsave}
-                    refetchPosts={refetchPosts}
-                    myCommentPostRefetch={myCommentPostRefetch}
-                    isDarkMode={isDarkMode}
-                    isGridView={isGridView}
-                  />
+                    className={isGridView ? 'break-inside-avoid mb-3 sm:mb-4' : ''}
+                  >
+                    <ProfilePostCard
+                      postData={post}
+                      onLike={handleLike}
+                      onOptionSelect={handleOptionSelect}
+                      onUnsave={handleUnsave}
+                      refetchPosts={refetchPosts}
+                      myCommentPostRefetch={myCommentPostRefetch}
+                      isDarkMode={isDarkMode}
+                      isGridView={isGridView}
+                    />
+                  </div>
                 ))}
               </div>
             ) : (

@@ -21,6 +21,55 @@ export const createQueryParams = (urlParams) => ({
   limit: urlParams.limit
 });
 
+// Sort posts based on sort parameter
+export const sortPosts = (posts, sortType) => {
+  if (!posts || posts.length === 0) return [];
+
+  const sortedPosts = [...posts]; // Create a copy to avoid mutating original array
+
+  switch (sortType) {
+    case 'newest':
+      return sortedPosts.sort((a, b) => {
+        const dateA = new Date(a.createdAt || a.timePosted);
+        const dateB = new Date(b.createdAt || b.timePosted);
+        return dateB - dateA; // Newest first
+      });
+
+    case 'oldest':
+      return sortedPosts.sort((a, b) => {
+        const dateA = new Date(a.createdAt || a.timePosted);
+        const dateB = new Date(b.createdAt || b.timePosted);
+        return dateA - dateB; // Oldest first
+      });
+
+    case 'popular':
+      return sortedPosts.sort((a, b) => {
+        // Sort by likes first, then by comments, then by views
+        const likesA = a.likes?.length || a.stats?.likes || 0;
+        const likesB = b.likes?.length || b.stats?.likes || 0;
+
+        if (likesA !== likesB) {
+          return likesB - likesA; // More likes first
+        }
+
+        const commentsA = a.comments?.length || a.stats?.comments || 0;
+        const commentsB = b.comments?.length || b.stats?.comments || 0;
+
+        if (commentsA !== commentsB) {
+          return commentsB - commentsA; // More comments first
+        }
+
+        const viewsA = a.views || a.stats?.reads || 0;
+        const viewsB = b.views || b.stats?.reads || 0;
+
+        return viewsB - viewsA; // More views first
+      });
+
+    default:
+      return sortedPosts;
+  }
+};
+
 // Format timestamp
 export const formatTime = (timestamp) => (
   timestamp ? moment.utc(timestamp).utcOffset(6).fromNow() : "Just now"

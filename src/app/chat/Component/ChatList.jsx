@@ -42,9 +42,7 @@ const ChatList = ({ setIsChatActive, status }) => {
 
   const { data: chatListData, isLoading, isError, refetch } = useGetAllChatQuery(debouncedSearchTerm);
 
-  const { chats } = useSelector((state) => state);
-
-  // console.log(chats?.chats)
+  const { chats } = useSelector((state) => state.chats);
 
   const chatList = useMemo(() => {
     if (!chatListData?.data?.chats) return [];
@@ -52,9 +50,6 @@ const ChatList = ({ setIsChatActive, status }) => {
       return new Date(b.lastMessage?.createdAt || 0) - new Date(a.lastMessage?.createdAt || 0);
     });
   }, [chatListData?.data?.chats]);
-
-  // console.log(chatList)
-
 
   const handleSelectChat = async (chatId) => {
     router.push(`/chat/${chatId}`);
@@ -100,8 +95,6 @@ const ChatList = ({ setIsChatActive, status }) => {
       toast.error(error?.data?.message || 'Failed to toggle mute status');
     }
   };
-
-
 
   const handleBlockChat = async (chatId) => {
     try {
@@ -150,13 +143,13 @@ const ChatList = ({ setIsChatActive, status }) => {
       key: 'mute',
       label: chat.isMuted ? 'Unmute Chat' : 'Mute Chat',
       icon: chat.isMuted ? <BsBell /> : <BsBellSlash />,
-      onClick: () => handleMuteChat(chat._id) // Remove the isMuted parameter here
+      onClick: () => handleMuteChat(chat._id)
     },
     {
       key: 'block',
       label: chat.isBlocked ? 'Unblock User' : 'Block User',
       icon: <BsBlockquoteRight />,
-      onClick: () => handleBlockChat(chat._id) // Just pass chatId
+      onClick: () => handleBlockChat(chat._id)
     },
     {
       key: 'delete',
@@ -168,9 +161,8 @@ const ChatList = ({ setIsChatActive, status }) => {
   ];
 
   return (
-    <div className={`w-full h-[80vh] rounded-lg flex flex-col
-      ${isDarkMode ? 'dark-mode bg-gray-800 border-gray-700' : 'bg-[#f9f9f9] shadow-lg border-gray-700'}`}>
-
+    <div className={`w-full h-[80vh] rounded-lg flex flex-col shadow-lg border border-gray-200  ${isDarkMode ? 'dark-mode bg-gray-800' : 'bg-[#f9f9f9]'
+      }`}>
       <div className="p-4">
         <Flex gap={8}>
           <Input
@@ -185,8 +177,8 @@ const ChatList = ({ setIsChatActive, status }) => {
         </Flex>
       </div>
 
-      <div className={`chat-list-container flex-1 overflow-y-auto px-4
-        ${isDarkMode ? 'scrollbar-dark' : 'scrollbar-light'}`}>
+      <div className={`chat-list-container flex-1 overflow-y-auto px-4 ${isDarkMode ? 'scrollbar-dark' : 'scrollbar-light'
+        }`}>
         <style jsx global>{`
           .chat-list-container::-webkit-scrollbar {
             width: 6px;
@@ -204,11 +196,11 @@ const ChatList = ({ setIsChatActive, status }) => {
             <div
               key={chat?._id}
               onClick={() => handleSelectChat(chat?._id)}
-              className={`flex items-center gap-4 p-4 cursor-pointer rounded-lg relative group
-                ${chat?._id === id
+              className={`flex items-center gap-4 p-4 cursor-pointer rounded-lg relative group ${chat?._id === id
                   ? (isDarkMode ? 'bg-gray-700' : 'bg-[#EBF4FF]')
-                  : (isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-[#EBF4FF]')}
-                ${isDarkMode ? 'text-gray-200' : 'text-gray-800'}`}
+                  : (isDarkMode ? 'hover:bg-gray-700' : 'hover:bg-[#EBF4FF]')
+                } ${isDarkMode ? 'text-gray-200' : 'text-gray-800'
+                }`}
             >
               <div className="relative">
                 <Avatar size={50} src={getImageUrl(chat?.participants?.[0]?.profile)} />
@@ -221,7 +213,8 @@ const ChatList = ({ setIsChatActive, status }) => {
 
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-center">
-                  <h3 className={`font-medium ${chat.isRead ? "font-normal " : "font-extrabold"} truncate ${chat.isBlocked ? 'line-through' : ''}`}>
+                  <h3 className={`font-medium ${chat.isRead ? "font-normal " : "font-extrabold"} truncate ${chat.isBlocked ? 'line-through' : ''
+                    }`}>
                     {chat?.participants?.[0]?.userName || "User"}
                   </h3>
                   <div className="flex items-center gap-2">
@@ -233,14 +226,10 @@ const ChatList = ({ setIsChatActive, status }) => {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {/* {chat.lastMessage?.read ? (
-                    <BsCheck2All className="text-blue-500" size={16} />
-                  ) : chat.lastMessage?.sender !== localStorage.getItem("login_user_id") ? (
-                    <BsCheck2 className="text-gray-400" size={16} />
-                  ) : null} */}
-
-                  <p className={`text-sm ${chat.isRead ? "font-normal" : "font-extrabold"} truncate ${isDarkMode ? 'text-white' : 'text-black'} ${!chat.lastMessage?.read && chat.lastMessage?.sender !== localStorage.getItem("login_user_id")
-                    ? 'font-semibold' : ''
+                  <p className={`text-sm ${chat.isRead ? "font-normal" : "font-extrabold"
+                    } truncate ${isDarkMode ? 'text-white' : 'text-black'
+                    } ${!chat.lastMessage?.read && chat.lastMessage?.sender !== localStorage.getItem("login_user_id")
+                      ? 'font-semibold' : ''
                     }`}>
                     {chat?.lastMessage?.text?.slice(0, 25) || ''}
                   </p>

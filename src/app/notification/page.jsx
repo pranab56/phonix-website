@@ -94,8 +94,6 @@ export default function NotificationPage() {
     }
   };
   const handleItemClick = async (notification) => {
-    // Mark as read if not already read
-    router.push(`/posts/${notification.postId}`);
     if (!notification.read) {
       try {
         await markSingleAsRead(notification.id).unwrap();
@@ -129,26 +127,20 @@ export default function NotificationPage() {
     }
   };
   const menu = (id, read) => (
-    <Menu
-      className={isDarkMode ? "bg-gray-800 text-gray-200" : ""}
-    >
-
+    <Menu className={isDarkMode ? "bg-gray-800 text-gray-200" : ""}>
       <Menu.Item
         key="delete"
         icon={<DeleteOutlined />}
         onClick={() => handleDeleteNotification(id)}
         danger
         disabled={processingNotificationId === id}
-        className={isDarkMode ? "hover:bg-gray-700 text-red-400" : ""}
-      >
+        className={isDarkMode ? "hover:bg-gray-700 text-red-400" : ""}>
         Delete
       </Menu.Item>
     </Menu>
   );
   // Get API notifications
   const apiNotifications = notifications?.notification || [];
-  // Transform the notification data to match the expected format
-  // Replace the transformedNotifications mapping with:
   const transformedNotifications = apiNotifications?.map(notification => ({
     id: notification._id,
     postId: notification.postId,

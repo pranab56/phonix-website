@@ -3,7 +3,6 @@ import { useContext } from 'react';
 import { ThemeContext } from '../../../app/ClientLayout';
 import { getCategoryName } from '../utils/postUtils';
 
-
 const FilterIndicator = ({ urlParams, posts, onClearFilters }) => {
   const { isDarkMode } = useContext(ThemeContext);
 
@@ -15,8 +14,21 @@ const FilterIndicator = ({ urlParams, posts, onClearFilters }) => {
     ? `Search results for "${urlParams.search}"`
     : getCategoryName(posts, urlParams);
 
+  // Updated sort display with better labels
+  const getSortDisplay = (sortType) => {
+    switch (sortType) {
+      case "oldest":
+        return "Oldest first";
+      case "popular":
+        return "Most popular";
+      case "newest":
+      default:
+        return "Newest first";
+    }
+  };
+
   const sortDisplay = urlParams.sort !== "newest"
-    ? `(Sorted by: ${urlParams.sort === "oldest" ? "Oldest first" : "Most popular"})`
+    ? `(Sorted by: ${getSortDisplay(urlParams.sort)})`
     : "";
 
   return (

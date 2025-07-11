@@ -19,8 +19,13 @@ export const useHomePage = () => {
   // Extract URL parameters
   const urlParams = useMemo(() => extractUrlParams(searchParams), [searchParams]);
 
-  // API query params
-  const queryParams = useMemo(() => createQueryParams(urlParams), [urlParams]);
+  // API query params with fixed limit of 30
+  const queryParams = useMemo(() => {
+    const params = createQueryParams(urlParams);
+    // Always set limit to 30 for posts per page
+    params.limit = 30;
+    return params;
+  }, [urlParams]);
 
   // API calls
   const { data: apiData, isLoading, error, refetch } = useGetPostQuery(queryParams);
@@ -35,9 +40,9 @@ export const useHomePage = () => {
       posts: posts.map(post => formatPostData(post, currentUser.id)),
       pagination: {
         currentPage: meta.page || urlParams.page,
-        postsPerPage: meta.limit || urlParams.limit,
+        postsPerPage: 30, // Fixed to 30 posts per page
         totalPosts: meta.total || 0,
-        totalPages: meta.totalPage || Math.ceil((meta.total || 0) / (meta.limit || urlParams.limit))
+        totalPages: meta.totalPage || Math.ceil((meta.total || 0) / 30) // Use 30 for calculation
       }
     };
   }, [apiData, urlParams, currentUser.id]);

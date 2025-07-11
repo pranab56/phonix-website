@@ -75,7 +75,7 @@ const PostCard = ({
   );
 
   const handleImageClick = useCallback((index) => {
-    console.log('Image clicked, index:', index); // Debug log
+    console.log('Image clicked, index:', index);
     setCurrentImageIndex(index);
     setShowImageModal(true);
   }, []);
@@ -248,7 +248,7 @@ const PostCard = ({
           </button>
         </>
       ) : (
-        postData.content.replace(/<[^>]+>/g, '')
+        postData.content.replace(/(Powered by Froala Editor|<[^>]+>)/g, '')
       )}
     </div>
   ), [postData.content, isMobile, handleCommentClick, isDarkMode]);
