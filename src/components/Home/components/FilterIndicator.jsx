@@ -1,4 +1,4 @@
-import { Button, Card } from 'antd';
+import { Card } from 'antd';
 import { useContext } from 'react';
 import { ThemeContext } from '../../../app/ClientLayout';
 import { getCategoryName } from '../utils/postUtils';
@@ -47,9 +47,9 @@ const FilterIndicator = ({ urlParams, posts, onClearFilters }) => {
             </span>
           )}
         </div>
-        <Button style={{ color: "#1919e0" }} type="link" onClick={onClearFilters}>
+        <span className='text-blue-600 font-medium cursor-pointer' onClick={onClearFilters}>
           Clear All Filters
-        </Button>
+        </span>
       </div>
     </Card>
   );
