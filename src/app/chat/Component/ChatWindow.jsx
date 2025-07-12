@@ -168,6 +168,7 @@ const ChatWindow = ({ id }) => {
         setImagePreview(null);
         setShowEmojiPicker(false);
         setReplyingTo(null);
+        antMessage.success("Message sent successfully!");
         setTimeout(() => scrollToBottom('auto'), 100);
       }
     } catch (error) {
@@ -212,36 +213,9 @@ const ChatWindow = ({ id }) => {
   const handleAddReaction = async (messageId, reaction) => {
     try {
       await messageReact({ messageId, reaction }).unwrap();
-      const updatedMessages = messages.map(msg => {
-        if (msg._id === messageId) {
-          const existingReactionIndex = msg.reactions.findIndex(r => r.userId._id === loginUserId);
-          if (existingReactionIndex >= 0) {
-            const updatedReactions = [...msg.reactions];
-            updatedReactions[existingReactionIndex] = {
-              ...updatedReactions[existingReactionIndex],
-              reactionType: reaction,
-              timestamp: new Date().toISOString()
-            };
-            return { ...msg, reactions: updatedReactions };
-          } else {
-            return {
-              ...msg,
-              reactions: [
-                ...msg.reactions,
-                {
-                  userId: { _id: loginUserId },
-                  reactionType: reaction,
-                  timestamp: new Date().toISOString(),
-                  _id: `temp-${Date.now()}`
-                }
-              ]
-            };
-          }
-        }
-        return msg;
-      });
-      dispatch({ type: 'message/setMessages', payload: updatedMessages });
       setShowReactionPicker({ messageId: null, show: false });
+      antMessage.success("Reaction added!");
+      refetch(); // Refresh messages to show updated reactions
     } catch (error) {
       antMessage.error("Failed to add reaction");
     }
@@ -273,29 +247,21 @@ const ChatWindow = ({ id }) => {
     }
   };
 
-  const RippleEffect = ({ isCurrentUser }) => {
-    return (
-      <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
-        {[...Array(3)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute inset-0 opacity-0"
-            style={{
-              background: isCurrentUser
-                ? 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%)'
-                : 'radial-gradient(circle, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0) 70%)',
-              animation: `ripple 1s ${i * 0.2}s forwards`,
-            }}
-          />
-        ))}
-      </div>
-    );
+  const getReactionEmoji = (reactionType) => {
+    const reactionMap = {
+      love: "❤️",
+      thumbs_up: "👍",
+      laugh: "😂",
+      angry: "😡",
+      sad: "😢"
+    };
+    return reactionMap[reactionType] || "👍";
   };
 
   const messageVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-    exit: { opacity: 0, x: -100 }
+    hidden: { opacity: 0, y: 20, scale: 0.8 },
+    visible: { opacity: 1, y: 0, scale: 1 },
+    exit: { opacity: 0, scale: 0.8, transition: { duration: 0.2 } }
   };
 
   const replyVariants = {
@@ -304,7 +270,7 @@ const ChatWindow = ({ id }) => {
   };
 
   return (
-    <div className={`w-full h-[80vh] rounded-lg flex flex-col shadow-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-[#f9f9f9] border-gray-200'}`}>
+    <div className={`w-full h-[80vh] rounded-lg flex flex-col shadow-lg border ${isDarkMode ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
       {/* Header */}
       {chatUser?.participants.map(item => (
         <div key={item._id} className={`flex items-center space-x-4 p-4 border-b ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}>
@@ -313,35 +279,42 @@ const ChatWindow = ({ id }) => {
               src={getImageUrl(item?.profile)}
               size={48}
             />
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
           </div>
           <div>
             <h2 className={`text-xl font-semibold ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>{item?.userName}</h2>
-            <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>Online</p>
+            <p className={`text-sm ${isDarkMode ? 'text-green-400' : 'text-green-500'}`}>Online</p>
           </div>
         </div>
       ))}
 
+      {/* Pinned Message */}
       {pinnedMessageId && (
-        <div className={`p-2 border-b ${isDarkMode ? 'bg-gray-700 border-gray-700' : 'bg-gray-100 border-gray-200'}`}>
-          <div className="flex items-center text-sm font-medium">
-            <TbPinned className="mr-1" />
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className={`p-3 border-b ${isDarkMode ? 'bg-gray-700 border-gray-600' : 'bg-blue-50 border-blue-200'}`}
+        >
+          <div className="flex items-center text-sm font-medium text-blue-600">
+            <TbPinned className="mr-2" />
             Pinned Message
           </div>
           <div className="mt-1">
             {messages.find(msg => msg._id === pinnedMessageId) && (
               <div className="flex items-start text-sm">
-                <span className="truncate">
-                  {messages.find(msg => msg._id === pinnedMessageId).text || "Pinned message"}
+                <span className="truncate text-gray-600">
+                  {messages.find(msg => msg._id === pinnedMessageId).text || "📷 Image"}
                 </span>
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
       )}
 
+      {/* Messages Container */}
       <div
         ref={messagesContainerRef}
-        className={`flex-1 p-4 overflow-y-auto message-container ${isDarkMode ? 'bg-gray-800' : 'bg-[#f9f9f9]'}`}
+        className={`flex-1 p-4 overflow-y-auto message-container ${isDarkMode ? 'bg-gray-800' : 'bg-gray-50'}`}
       >
         <style jsx global>{`
           .message-container::-webkit-scrollbar {
@@ -349,40 +322,53 @@ const ChatWindow = ({ id }) => {
           }
           .message-container::-webkit-scrollbar-track {
             background: ${isDarkMode ? '#2D3748' : '#F5F5F6'};
+            border-radius: 10px;
           }
           .message-container::-webkit-scrollbar-thumb {
             background-color: ${isDarkMode ? '#4A5568' : '#CBD5E0'};
+            border-radius: 10px;
+          }
+          .message-container::-webkit-scrollbar-thumb:hover {
+            background-color: ${isDarkMode ? '#718096' : '#A0AEC0'};
           }
           .message-bubble {
             position: relative;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
+            transform-origin: center;
+          }
+          .message-bubble:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           }
           .message-options {
             opacity: 0;
-            transition: opacity 0.2s ease;
+            transition: all 0.3s ease;
+            transform: translateX(10px);
           }
           .message-wrapper:hover .message-options {
             opacity: 1;
+            transform: translateX(0);
           }
           .deleted-message {
-            background-color: ${isDarkMode ? '#3B3B3B' : '#f0f0f0'} !important;
+            background-color: ${isDarkMode ? '#4A5568' : '#F7FAFC'} !important;
             font-style: italic;
+            opacity: 0.7;
           }
-          @keyframes ripple {
-            0% {
-              transform: scale(0.8);
-              opacity: 0.4;
-            }
-            100% {
-              transform: scale(2.5);
-              opacity: 0;
-            }
+          .reply-indicator {
+            border-left: 3px solid #3B82F6;
+            padding-left: 8px;
+            margin-bottom: 8px;
+            background: ${isDarkMode ? 'rgba(59, 130, 246, 0.1)' : 'rgba(59, 130, 246, 0.05)'};
+            border-radius: 4px;
           }
         `}</style>
 
         {loadingMore && (
-          <div className="flex justify-center py-2">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500"></div>
+          <div className="flex justify-center py-4">
+            <div className="flex items-center space-x-2">
+              <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-500"></div>
+              <span className="text-sm text-gray-500">Loading more messages...</span>
+            </div>
           </div>
         )}
 
@@ -399,105 +385,137 @@ const ChatWindow = ({ id }) => {
                 animate="visible"
                 exit="exit"
                 variants={messageVariants}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.3, type: "spring", stiffness: 100 }}
                 className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'} mb-6 message-wrapper`}
               >
                 {!isCurrentUser && (
                   <Avatar
                     src={getImageUrl(message.sender?.profile)}
                     size={32}
-                    className="mr-2 self-start mt-1"
+                    className="mr-3 self-start mt-1"
                   />
                 )}
 
-                <div className="relative group max-w-[80%]">
+                <div className="relative group max-w-[75%]">
+                  {/* Pin indicator */}
                   {isPinned && (
-                    <div className="absolute -top-4 left-0 right-0 flex justify-center">
-                      <BsPinAngleFill className="text-gray-400 text-xs" />
-                    </div>
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-5 left-1/2 transform -translate-x-1/2"
+                    >
+                      <BsPinAngleFill className="text-blue-500 text-sm" />
+                    </motion.div>
                   )}
 
                   <motion.div
-                    className={`relative p-3 rounded-2xl ${isDeleted
+                    className={`relative p-4 rounded-2xl ${isDeleted
                       ? 'deleted-message'
                       : isCurrentUser
                         ? 'bg-blue-500 text-white'
                         : isDarkMode
                           ? 'bg-gray-700 text-gray-200'
-                          : 'bg-white text-gray-800'
+                          : 'bg-white text-gray-800 border border-gray-200'
                       } shadow-sm message-bubble`}
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
                   >
-                    <RippleEffect isCurrentUser={isCurrentUser} />
-
+                    {/* Reply indicator */}
                     {message.replyTo && !isDeleted && (
-                      <div className={`mb-2 p-2 text-xs rounded-lg ${isCurrentUser ? 'bg-blue-600' : 'bg-gray-200'
-                        } ${isDarkMode && !isCurrentUser ? 'bg-gray-600' : ''}`}>
-                        <p className="font-medium">Replying to:</p>
-                        <p className="truncate">{message.replyTo.text || "Message"}</p>
+                      <div className="reply-indicator p-2 mb-2 text-xs rounded-lg">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-6 h-6 rounded-full bg-gray-300 flex items-center justify-center">
+                            <Avatar
+                              src={getImageUrl(message.replyTo.sender?.profile)}
+                              size={20}
+                            />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-blue-600 truncate">
+                              {message.replyTo.sender?.userName || 'User'}
+                            </p>
+                            <p className="truncate text-gray-500">
+                              {message.replyTo.text || "📷 Image"}
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     )}
 
+                    {/* Message content */}
                     {message.images?.length > 0 && !isDeleted && (
-                      <div className="mt-2">
+                      <div className="mb-3">
                         <img
                           src={getImageUrl(message.images[0])}
                           alt="Message attachment"
-                          className="rounded-lg max-w-full h-auto max-h-64 object-cover"
+                          className="rounded-lg max-w-full h-auto max-h-64 object-cover cursor-pointer hover:opacity-90 transition-opacity"
+                          onClick={() => window.open(getImageUrl(message.images[0]), '_blank')}
                         />
                       </div>
                     )}
 
                     {!isDeleted && message.text && (
-                      <p className="whitespace-pre-wrap">{message.text}</p>
+                      <p className="whitespace-pre-wrap break-words">{message.text}</p>
                     )}
 
                     {isDeleted && (
-                      <p className="text-gray-500 italic">This message has been deleted</p>
+                      <p className="text-gray-500 italic flex items-center">
+                        <span className="mr-2">🗑️</span>
+                        This message has been deleted
+                      </p>
                     )}
 
-                    <div className="flex items-center justify-end mt-1 space-x-1">
-                      <span className={`text-xs ${isCurrentUser ? 'text-blue-100' : 'text-gray-500'
+                    {/* Message meta */}
+                    <div className="flex items-center justify-between mt-2">
+                      <span className={`text-xs ${isCurrentUser
+                        ? 'text-blue-100'
+                        : isDarkMode
+                          ? 'text-gray-400'
+                          : 'text-gray-500'
                         }`}>
                         {formatDate(message.createdAt)}
                       </span>
                       {message.read && isCurrentUser && (
-                        <span className="text-xs text-blue-200">✓✓</span>
+                        <span className="text-xs text-blue-200 ml-2">✓✓</span>
                       )}
                     </div>
 
+                    {/* Reactions */}
                     {!isDeleted && message.reactions?.length > 0 && (
                       <motion.div
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
-                        className="flex gap-1 absolute -bottom-3"
+                        className="flex gap-1 mt-2"
                       >
-                        <div className={`flex items-center justify-start px-1.5 py-0.5 rounded-full ${isDarkMode ? 'bg-gray-600' : 'bg-gray-100'
+                        <div className={`flex items-center px-2 py-1 rounded-full ${isDarkMode ? 'bg-gray-600' : 'bg-gray-100'
                           } shadow-sm`}>
                           {message.reactions.map((reaction, i) => (
-                            <Tooltip key={i} title={`${reaction?.userId?.userName || 'User'}`}>
-                              <span className="text-sm">
-                                {reaction.reactionType === "love" && "❤️"}
-                                {reaction.reactionType === "thumbs_up" && "👍"}
-                                {reaction.reactionType === "laugh" && "😂"}
-                                {reaction.reactionType === "angry" && "😡"}
-                                {reaction.reactionType === "sad" && "😢"}
+                            <Tooltip key={i} title={reaction?.userId?.userName || 'User'}>
+                              <span className="text-sm mr-1">
+                                {getReactionEmoji(reaction.reactionType)}
                               </span>
                             </Tooltip>
                           ))}
+                          <span className="text-xs text-gray-500 ml-1">
+                            {message.reactions.length}
+                          </span>
                         </div>
                       </motion.div>
                     )}
                   </motion.div>
 
+                  {/* Message options */}
                   {!isDeleted && (
                     <div className={`message-options absolute ${isCurrentUser ? 'left-0 -translate-x-full' : 'right-0 translate-x-full'
-                      } top-1/2 -translate-y-1/2 flex`}>
+                      } top-1/2 -translate-y-1/2 flex space-x-1`}>
                       <Button
                         type="text"
                         size="small"
                         icon={<BsEmojiSmile />}
-                        className={`flex items-center justify-center p-1 rounded-full ${isDarkMode ? 'text-gray-300 bg-gray-700 hover:bg-gray-600' : 'text-gray-600 bg-white hover:bg-gray-100'
-                          } shadow-sm`}
+                        className={`flex items-center justify-center p-2 rounded-full transition-all ${isDarkMode
+                          ? 'text-gray-300 bg-gray-700 hover:bg-gray-600'
+                          : 'text-gray-600 bg-white hover:bg-gray-100'
+                          } shadow-md hover:shadow-lg`}
                         onClick={() => toggleReactionPicker(message._id)}
                       />
 
@@ -524,31 +542,37 @@ const ChatWindow = ({ id }) => {
                           type="text"
                           size="small"
                           icon={<FiMoreVertical />}
-                          className={`ml-1 flex items-center justify-center p-1 rounded-full ${isDarkMode ? 'text-gray-300 bg-gray-700 hover:bg-gray-600' : 'text-gray-600 bg-white hover:bg-gray-100'
-                            } shadow-sm`}
+                          className={`flex items-center justify-center p-2 rounded-full transition-all ${isDarkMode
+                            ? 'text-gray-300 bg-gray-700 hover:bg-gray-600'
+                            : 'text-gray-600 bg-white hover:bg-gray-100'
+                            } shadow-md hover:shadow-lg`}
                         />
                       </Dropdown>
                     </div>
                   )}
 
+                  {/* Reaction picker */}
                   {!isDeleted && showReactionPicker.show && showReactionPicker.messageId === message._id && (
                     <motion.div
                       ref={reactionPickerRef}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`absolute z-10 p-1 mt-3 rounded-full flex items-start gap-1 ${isDarkMode ? 'backdrop-blur-xs' : 'backdrop-blur-xs border border-gray-200'
-                        } ${isCurrentUser ? 'right-0' : 'left-0'
-                        } -top-8 justify-start`}
+                      initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                      className={`absolute z-20 p-2 mt-2 rounded-full flex items-center gap-1 ${isDarkMode
+                        ? 'bg-gray-700 border border-gray-600'
+                        : 'bg-white border border-gray-200'
+                        } shadow-lg ${isCurrentUser ? 'right-0' : 'left-0'
+                        } -top-12`}
                     >
                       {reactions.map((reaction) => (
                         <Button
                           key={reaction.name}
                           type="text"
                           size="small"
-                          className="p-1 hover:bg-gray-100 rounded-full"
+                          className="p-1 hover:bg-gray-100 rounded-full transition-all hover:scale-110"
                           onClick={() => handleAddReaction(message._id, reaction.name)}
                         >
-                          {reaction.emoji}
+                          <span className="text-lg">{reaction.emoji}</span>
                         </Button>
                       ))}
                     </motion.div>
@@ -559,7 +583,7 @@ const ChatWindow = ({ id }) => {
                   <Avatar
                     src={getImageUrl(message.sender?.profile)}
                     size={32}
-                    className="ml-2 self-start mt-1"
+                    className="ml-3 self-start mt-1"
                   />
                 )}
               </motion.div>
@@ -569,56 +593,75 @@ const ChatWindow = ({ id }) => {
         <div ref={messagesEndRef} />
       </div>
 
-      {replyingTo && (
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          exit="hidden"
-          variants={replyVariants}
-          className={`p-2 border-t ${isDarkMode ? 'border-gray-700 bg-gray-700' : 'border-gray-200 bg-gray-100'}`}
-        >
-          <div className="flex justify-between items-center">
-            <div className="flex-1">
-              <p className="text-xs font-medium">Replying to {replyingTo.sender?.userName}</p>
-              <p className="text-xs truncate">{replyingTo.text || "Message"}</p>
+      {/* Reply indicator */}
+      <AnimatePresence>
+        {replyingTo && (
+          <motion.div
+            initial="hidden"
+            animate="visible"
+            exit="hidden"
+            variants={replyVariants}
+            className={`p-3 border-t ${isDarkMode ? 'border-gray-700 bg-gray-700' : 'border-gray-200 bg-blue-50'}`}
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3 flex-1">
+                <div className="w-1 h-8 bg-blue-500 rounded-full"></div>
+                <Avatar
+                  src={getImageUrl(replyingTo.sender?.profile)}
+                  size={24}
+                />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-blue-600">
+                    Replying to {replyingTo.sender?.userName}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {replyingTo.text || "📷 Image"}
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="text"
+                size="small"
+                onClick={() => setReplyingTo(null)}
+                className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-full p-1"
+              >
+                ✕
+              </Button>
             </div>
-            <Button
-              type="text"
-              size="small"
-              onClick={() => setReplyingTo(null)}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              ×
-            </Button>
-          </div>
-        </motion.div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <div>
+      {/* Image preview */}
+      <AnimatePresence>
         {imagePreview && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
-            className="mx-2 relative"
+            exit={{ opacity: 0, height: 0 }}
+            className={`p-3 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'}`}
           >
             <div className="relative inline-block">
               <img
                 src={imagePreview}
                 alt="Preview"
-                className={`h-20 w-auto rounded object-cover border ${isDarkMode ? 'border-gray-600' : 'border-gray-200'}`}
+                className={`h-20 w-auto rounded-lg object-cover border-2 ${isDarkMode ? 'border-gray-600' : 'border-gray-200'
+                  }`}
               />
               <Button
                 type="text"
-                className={`absolute top-1 right-1 rounded-full p-0 flex items-center justify-center h-6 w-6 shadow-md ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'}`}
+                className={`absolute -top-2 -right-2 rounded-full p-0 flex items-center justify-center h-6 w-6 shadow-md ${isDarkMode ? 'bg-gray-700 text-white' : 'bg-white text-gray-800'
+                  } hover:bg-red-500 hover:text-white transition-all`}
                 onClick={removeImage}
               >
-                ×
+                ✕
               </Button>
             </div>
           </motion.div>
         )}
-      </div>
+      </AnimatePresence>
 
+      {/* Message input */}
       <div className={`p-3 border-t ${isDarkMode ? 'border-gray-700' : 'border-gray-200'} flex items-center`}>
         <Form form={form} onFinish={handleCreateNewMessage} className="flex-1 flex items-center">
           <Form.Item name="file" noStyle>

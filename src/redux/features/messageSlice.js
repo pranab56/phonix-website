@@ -16,8 +16,11 @@ const messageSlice = createSlice({
   initialState,
   reducers: {
     addMessage: (state, action) => {
-      if (!state.messages.some(msg => msg._id === action.payload._id)) {
-        state.messages.push(action.payload); // Changed from unshift to push
+      const existingIndex = state.messages.findIndex(msg => msg._id === action.payload._id);
+      if (existingIndex >= 0) {
+        state.messages[existingIndex] = action.payload;
+      } else {
+        state.messages.push(action.payload);
       }
     },
     resetMessages: (state) => {
@@ -108,13 +111,13 @@ const messageSlice = createSlice({
         state.isLoading = false;
         if (payload.data) {
           if (state.page === 1) {
-            state.messages = payload.data.messages || [];
+            state.messages = payload.data.messages.reverse() || [];
             state.pinnedMessages = payload.data.pinnedMessages || [];
           } else {
             const newMessages = payload.data.messages || [];
             const existingIds = new Set(state.messages.map(msg => msg._id));
             const uniqueNewMessages = newMessages.filter(msg => !existingIds.has(msg._id));
-            state.messages = [...uniqueNewMessages, ...state.messages]; // Changed order for pagination
+            state.messages = [...uniqueNewMessages.reverse(), ...state.messages];
           }
           state.hasMore = (payload.data.messages?.length || 0) >= state.limit;
         }

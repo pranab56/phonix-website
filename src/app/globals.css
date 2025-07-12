@@ -228,3 +228,21 @@
 a[href*="froala.com"] {
   display: none !important;
 }
+
+
+
+
+/* Fix 1: Remove border-radius */
+
+
+/* Fix 3: Fix box-shadow if it's hiding corners */
+.fr-wrapper {
+  box-shadow: none !important;
+  border: 1px solid #ddd !important;
+}
+
+/* Fix 4: Complete border styling */
+.fr-element {
+  border: 1px solid #ccc !important;
+  border-radius: 4px !important
+}

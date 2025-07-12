@@ -29,6 +29,14 @@ const SocketComponent = () => {
 
     // Message events
     socket.on(`newMessage::${loggedInUserId}`, (message) => {
+      // Ensure message has proper structure before adding
+      if (!message.sender) {
+        message.sender = {
+          _id: message.senderId || 'unknown',
+          userName: 'Unknown',
+          profile: null
+        };
+      }
       dispatch(addMessage(message));
       dispatch(updateLastMessage({
         chatId: message.chatId,

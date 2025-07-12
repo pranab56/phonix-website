@@ -31,8 +31,6 @@ export default function NotificationPage() {
   });
   const { notifications } = useSelector((state) => state);
 
-  console.log(notifications)
-
   // Total pages from meta data
   const total = notifications?.meta?.total || 0;
   const limit = notifications?.meta?.limit || 10;
@@ -94,12 +92,14 @@ export default function NotificationPage() {
     }
   };
   const handleItemClick = async (notification) => {
+    router.push(`/posts/${notification.postId}`)
     if (!notification.read) {
       try {
-        await markSingleAsRead(notification.id).unwrap();
-        toast.success("Notification marked as read");
-        router.push(`/posts/${notification.postId}`);
-
+        const response = await markSingleAsRead(notification.id).unwrap();
+        if (response.success) {
+          router.push(`/posts/${response?.data?.postId}`);
+          toast.success("Notification marked as read");
+        }
       } catch (error) {
         console.error('Failed to mark as read:', error);
         toast.error("Failed to mark notification as read");
